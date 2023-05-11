@@ -6,10 +6,10 @@ ROMFS_DIR = $(ROOTDIR)/romfs
 
 include $(ROOTDIR)/user/shared/boards.mk
 
-PROJECT_HOME_URL="https:\/\/bitbucket.org\/padavan\/rt-n56u\/"
-PROJECT_HOME_URL_MOD="https:\/\/github.com\/hanwckf\/rt-n56u\/"
+PPROJECT_HOME_URL="https:\/\/www.baidu.com\/"
+PROJECT_HOME_URL_MOD="https:\/\/mp.weixin.qq.com\/s\/mjnIWqu_ocYamwm2NDn7Dg\/"
 
-LABEL_COPYRIGHT_TEXT='© 2011-2021 <a href="https:\/\/bitbucket.org\/padavan\/rt-n56u" target="blank">Padavan<\/a> \& N56U project community \& by <a href="https:\/\/github.com\/hanwckf\/rt-n56u" target="blank">hanwckf<\/a>'
+LABEL_COPYRIGHT_TEXT='© GSWIF校园网路由器 <a href="https:\/\/www.baidu.com" target="blank">访问百度<\/a> \& 版本：1024 \& by <a href="https:\/\/mp.weixin.qq.com\/s\/mjnIWqu_ocYamwm2NDn7Dg" target="blank">诚招代理<\/a>'
 
 BOARD_PATTERN=s/ZVMODELVZ/$(CONFIG_FIRMWARE_PRODUCT_ID)/g
 COPYR_PATTERN=s/ZVCOPYRVZ/$(LABEL_COPYRIGHT_TEXT)/g
