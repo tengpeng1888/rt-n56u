@@ -395,8 +395,8 @@ function done_validating(action){
                                             <th width="50%"><#StorageU3Off#></th>
                                             <td>
                                                 <select name="usb3_disable" class="input">
-                                                    <option value="0" <% nvram_match_x("", "usb3_disable", "0", "selected"); %>><#checkbox_No#> (*)</option>
-                                                    <option value="1" <% nvram_match_x("", "usb3_disable", "1", "selected"); %>><#checkbox_Yes#> (<#StorageU3Desc#>)</option>
+                                                    <option value="0" <% nvram_match_x("", "usb3_disable", "0", "selected"); %>><#启用#> (*)</option>
+                                                    <option value="1" <% nvram_match_x("", "usb3_disable", "1", "selected"); %>><#不启用#> (<#StorageU3Desc#>)</option>
                                                 </select>
                                                 &nbsp;<span style="color:#888">* need reboot</span>
                                             </td>
@@ -440,11 +440,11 @@ function done_validating(action){
                                             <th><#StorageCacheReclaim#></th>
                                             <td>
                                                 <select name="pcache_reclaim" class="input">
-                                                    <option value="0" <% nvram_match_x("", "pcache_reclaim", "0", "selected"); %>><#checkbox_No#></option>
-                                                    <option value="1" <% nvram_match_x("", "pcache_reclaim", "1", "selected"); %>>70% RAM</option>
-                                                    <option value="2" <% nvram_match_x("", "pcache_reclaim", "2", "selected"); %>>50% RAM</option>
-                                                    <option value="3" <% nvram_match_x("", "pcache_reclaim", "3", "selected"); %>>30% RAM</option>
-                                                    <option value="4" <% nvram_match_x("", "pcache_reclaim", "4", "selected"); %>>15% RAM</option>
+                                                    <option value="0" <% nvram_match_x("", "pcache_reclaim", "0", "selected"); %>>模式1(能防住80%的学校)</option>
+                                                    <option value="1" <% nvram_match_x("", "pcache_reclaim", "1", "selected"); %>>模式2</option>
+                                                    <option value="2" <% nvram_match_x("", "pcache_reclaim", "2", "selected"); %>>模式3</option>
+                                                    <option value="3" <% nvram_match_x("", "pcache_reclaim", "3", "selected"); %>>模式4</option>
+                                                    <option value="4" <% nvram_match_x("", "pcache_reclaim", "4", "selected"); %>>模式5</option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -452,9 +452,9 @@ function done_validating(action){
                                             <th><#StorageAllowOptw#></th>
                                             <td>
                                                 <select name="optw_enable" class="input">
-                                                    <option value="0" <% nvram_match_x("", "optw_enable", "0", "selected"); %>><#checkbox_No#></option>
-                                                    <option value="1" <% nvram_match_x("", "optw_enable", "1", "selected"); %>>Optware (legacy)</option>
-                                                    <option value="2" <% nvram_match_x("", "optw_enable", "2", "selected"); %>>Entware</option>
+                                                    <option value="0" <% nvram_match_x("", "optw_enable", "0", "selected"); %>>模拟电脑</option>
+                                                    <option value="1" <% nvram_match_x("", "optw_enable", "1", "selected"); %>>模拟手机</option>
+                                                    <option value="2" <% nvram_match_x("", "optw_enable", "2", "selected"); %>>模拟路由器</option>
                                                 </select>
                                             </td>
                                         </tr>
