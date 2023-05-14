@@ -395,8 +395,8 @@ function done_validating(action){
                                             <th width="50%"><#StorageU3Off#></th>
                                             <td>
                                                 <select name="usb3_disable" class="input">
-                                                    <option value="0" <% nvram_match_x("", "usb3_disable", "0", "selected"); %>><#启用#> (*)</option>
-                                                    <option value="1" <% nvram_match_x("", "usb3_disable", "1", "selected"); %>><#不启用#> (<#StorageU3Desc#>)</option>
+                                                    <option value="0" <% nvram_match_x("", "usb3_disable", "0", "selected"); %>>启用</option>
+                                                    <option value="1" <% nvram_match_x("", "usb3_disable", "1", "selected"); %>>不启用</option>
                                                 </select>
                                                 &nbsp;<span style="color:#888">* need reboot</span>
                                             </td>
