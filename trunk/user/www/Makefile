@@ -161,14 +161,6 @@ endif
 ifndef CONFIG_ATA
 	rm -f $(INSTALLDIR)/www/device-map/sata.asp
 endif
-ifndef CONFIG_USB_SUPPORT
-	rm -f $(INSTALLDIR)/www/Advanced_Modem_others.asp
-	rm -f $(INSTALLDIR)/www/Advanced_Printer_others.asp
-	rm -f $(INSTALLDIR)/www/modem_isp.js
-	rm -f $(INSTALLDIR)/www/device-map/modem.asp
-	rm -f $(INSTALLDIR)/www/device-map/printer.asp
-	rm -f $(INSTALLDIR)/www/device-map/hub.asp
-endif
 ifneq ($(STORAGE_ENABLED),y)
 	rm -f $(INSTALLDIR)/www/Advanced_AiDisk_ftp.asp
 	rm -f $(INSTALLDIR)/www/Advanced_AiDisk_others.asp
