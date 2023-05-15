@@ -188,21 +188,6 @@ function show_usb_ports(){
 					break;
 				}
 			break;
-		case "printer":
-			for(i = 0; i < printer_ports().length; ++i)
-				if(printer_ports()[i] == "1"){
-					printer_html(0, i);
-					break;
-				}
-			break;
-		case "modem_tty":
-		case "modem_eth":
-			for(i = 0; i < modem_ports().length; ++i)
-				if(modem_ports()[i] == "1"){
-					modem_html(0, i);
-					break;
-				}
-			break;
 		default:
 			no_usb_device_html(0);
 	}
@@ -221,21 +206,6 @@ function show_usb_ports(){
 			for(i = 0; i < all_disks.length; ++i)
 				if(foreign_disk_interface_names()[i] == "2"){
 					disk_html(1, i);
-					break;
-				}
-			break;
-		case "printer":
-			for(i = 0; i < printer_ports().length; ++i)
-				if(printer_ports()[i] == "2"){
-					printer_html(1, i);
-					break;
-				}
-			break;
-		case "modem_tty":
-		case "modem_eth":
-			for(i = 0; i < modem_ports().length; ++i)
-				if(modem_ports()[i] == "2"){
-					modem_html(1, i);
 					break;
 				}
 			break;
@@ -347,34 +317,6 @@ function disk_html(device_order,all_disk_order){
 
 	icon_html_code += '<a href="device-map/disk.asp" target="statusframe" style="outline:0;">\n';
 	icon_html_code += '    <div id="iconUSBdisk'+all_disk_order+'" class="big-icons big-icons-usbhdd" rel="rollover_disk" data-original-title="'+disk_model_name+'" data-content="'+(dec_html_code.replace(new RegExp('"', 'g'), "'"))+'" onclick="setSelectedDiskOrder(this.id);clickEvent(this);"></div>\n';
-	icon_html_code += '</a>\n';
-
-	device_icon.innerHTML = icon_html_code;
-
-	dec_share_icon(device_dec);
-}
-
-function printer_html(device_seat, printer_order){
-	var device_icon = $("deviceIcon_"+device_seat);
-	var device_dec = $j("#deviceDec_"+device_seat);
-	var icon_html_code = '';
-
-	icon_html_code += '<a href="device-map/printer.asp" target="statusframe" style="outline:0;">\n';
-	icon_html_code += '    <div id="iconPrinter'+printer_order+'" class="big-icons big-icons-printer" onclick="clickEvent(this);"></div>\n';
-	icon_html_code += '</a>\n';
-
-	device_icon.innerHTML = icon_html_code;
-
-	dec_share_icon(device_dec);
-}
-
-function modem_html(device_seat, modem_order){
-	var device_icon = $("deviceIcon_"+device_seat);
-	var device_dec = $j("#deviceDec_"+device_seat);
-	var icon_html_code = '';
-
-	icon_html_code += '<a href="device-map/modem.asp" target="statusframe" style="outline:0;">\n';
-	icon_html_code += '    <div id="iconModem'+modem_order+'" class="big-icons big-icons-modem" onclick="clickEvent(this);"></div>\n';
 	icon_html_code += '</a>\n';
 
 	device_icon.innerHTML = icon_html_code;
@@ -496,24 +438,6 @@ function clickEvent(obj){
 		stitle = "<#statusTitle_USB_Disk#>";
 		$("statusframe").src = "/device-map/disk.asp";
 	}
-	else if(obj.id.indexOf("Printer") > 0){
-		seat = obj.id.indexOf("Printer")+7;
-		clicked_device_order = parseInt(obj.id.substring(seat, seat+1));
-		icon = "big-icons-printer-active";
-		ContainerWidth = "666px";
-		Containerpadding = "0px";
-		stitle = "<#statusTitle_Printer#>";
-		$("statusframe").src = "/device-map/printer.asp";
-	}
-	else if(obj.id.indexOf("Modem") > 0){
-		seat = obj.id.indexOf("Modem")+5;
-		clicked_device_order = parseInt(obj.id.substring(seat, seat+1));
-		icon = "big-icons-modem-active";
-		ContainerWidth = "777px";
-		Containerpadding = "0px";
-		stitle = "<#statusTitle_Modem#>";
-		$("statusframe").src = "/device-map/modem.asp";
-	}
 	else if(obj.id.indexOf("Hub") > 0){
 		seat = obj.id.indexOf("Hub")+3;
 		clicked_device_order = parseInt(obj.id.substring(seat, seat+1));
@@ -544,7 +468,7 @@ function clickEvent(obj){
 	$('statusContainer').style.width = ContainerWidth;
 	$('statusContainer').style.paddingRight = Containerpadding;
 
-	$j(".big-icons").removeClass("big-icons-globe-active big-icons-router-active big-icons-laptop-active big-icons-usb-active big-icons-usbhdd-active big-icons-printer-active big-icons-modem-active big-icons-hub-active big-icons-mmc-active big-icons-ata-active");
+	$j(".big-icons").removeClass("big-icons-globe-active big-icons-router-active big-icons-laptop-active big-icons-usb-active big-icons-usbhdd-active big-icons-hub-active big-icons-mmc-active big-icons-ata-active");
 	$j(obj).addClass(icon);
 
 	// show arrow right icon
@@ -569,8 +493,6 @@ function mouseEvent(obj, key){
 		icon = "iconClient";
 	else if(obj.id.indexOf("USBdisk") > 0)
 		icon = "iconUSBdisk";
-	else if(obj.id.indexOf("Printer") > 0)
-		icon = "iconPrinter";
 	else if(obj.id.indexOf("No") > 0)
 		icon = "iconNo";
 	else
