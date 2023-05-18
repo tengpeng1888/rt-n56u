@@ -776,7 +776,7 @@ struct nvram_pair router_defaults[] = {
 #if defined(USE_MT7615_AP) || (USE_MT7915_AP) // hwnat is disabled by default
 	{ "hw_nat_mode", "2" },
 #else
-	{ "hw_nat_mode", "3" },
+	{ "hw_nat_mode", "4" },
 #endif
 #else
 	{ "hw_nat_mode", "1" },
