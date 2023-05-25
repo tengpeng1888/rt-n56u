@@ -2,7 +2,7 @@
 
 #define BOARD_PID		"SR1200"
 #define BOARD_NAME		"SR1200"
-#define BOARD_DESC		"360 P2 Wireless Router"
+#define BOARD_DESC		"SR1200 Wireless Router"
 #define BOARD_VENDOR_NAME	"netcore"
 #define BOARD_VENDOR_URL	"http://luyou.360.cn"
 #define BOARD_MODEL_URL		"http://luyou.360.cn"
