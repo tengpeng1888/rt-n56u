@@ -5,4 +5,4 @@
 ##################################################################
 
 CFLAGS += -DBOARD_SR1200
-BOARD_NUM_USB_PORTS=1
+BOARD_NUM_USB_PORTS=0
