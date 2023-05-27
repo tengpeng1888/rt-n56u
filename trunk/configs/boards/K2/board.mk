@@ -4,5 +4,5 @@
 # K2  # PHICOMM K2   # MT7620  #
 ##################################################################
 
-CFLAGS += -DBOARD_K2 -DVENDOR_PHICOMM
+CFLAGS += -DBOARD_K2
 BOARD_NUM_USB_PORTS=0
