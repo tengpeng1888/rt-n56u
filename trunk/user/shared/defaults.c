@@ -165,7 +165,7 @@ struct nvram_pair router_defaults[] = {
 	{ "wl_gmode", "2" },			/* A/N Mixed */
 #endif
 	{ "wl_mcs_mode", "0" },
-	{ "wl_channel", "5" },			/* Channel number */
+	{ "wl_channel", "149" },			/* Channel number */
 	{ "wl_bcn", "100" },			/* Beacon interval */
 	{ "wl_dtim", "1" },			/* DTIM period */
 	{ "wl_rts", "2347" },			/* RTS threshold */
