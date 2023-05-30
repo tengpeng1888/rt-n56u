@@ -36,7 +36,7 @@
 #define DEF_LAN_MASK		"255.255.255.0"
 
 #define DEF_WLAN_2G_CC		"CN"
-#define DEF_WLAN_5G_CC		"AU"
+#define DEF_WLAN_5G_CC		"US"
 #define DEF_WLAN_2G_SSID	"PDCN"
 #define DEF_WLAN_5G_SSID	"PDCN_5G"
 #define DEF_WLAN_2G_GSSID	"PDCN_GUEST"
