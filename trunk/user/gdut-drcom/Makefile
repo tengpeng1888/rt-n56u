@@ -23,4 +23,4 @@ clean:
 
 romfs:
 	$(ROMFSINST) -p +x $(THISDIR)/$(SRC_NAME)/src/gdut-drcom /usr/bin/gdut-drcom
-	$(ROMFSINST) -d $(THISDIR)/$(SRC_NAME)/src/gdut-drcom.conf /etc_ro/gdut-drcom/gdut-drcom.conf
+	$(ROMFSINST) -d $(THISDIR)/$(SRC_NAME)/src/hangzhou.so /usr/bin/shanxun.so
