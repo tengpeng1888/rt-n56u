@@ -322,7 +322,7 @@ EOF
 ### \$2 - WAN interface name (e.g. eth3 or ppp0)
 ### \$3 - WAN IPv4 address
 
-if [ $1 == "up" ] ; then
+if [ \$1 == "up" ] ; then
     sleep 5
     /usr/bin/bin_mentohust restart  &
 fi
