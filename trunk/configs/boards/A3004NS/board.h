@@ -7,7 +7,7 @@
 #define BOARD_VENDOR_URL	"http://www.totolink.cn/"
 #define BOARD_MODEL_URL		"http://www.totolink.cn/index.php/Product/show/73.html"
 #define BOARD_BOOT_TIME		30
-#define BOARD_FLASH_TIME		120
+#define BOARD_FLASH_TIME	120
 #define BOARD_GPIO_BTN_RESET	4
 #define BOARD_GPIO_BTN_WPS	3
 #undef BOARD_GPIO_LED_ALL
