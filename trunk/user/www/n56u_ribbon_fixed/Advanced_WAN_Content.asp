@@ -48,11 +48,11 @@ function initial(){
 	show_footer();
 
 	if (!support_ipv4_ppe()){
-		showhide_div('row_hwnat', 0);
+		showhide_div('row_hwnat', 4);
 	}
 
 	if (support_sfe()){
-		showhide_div('row_sfe', 1);
+		showhide_div('row_sfe', 0);
 	}
 
 	var o1 = document.form.wan_auth_mode;
