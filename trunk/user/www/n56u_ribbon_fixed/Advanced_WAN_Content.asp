@@ -52,7 +52,7 @@ function initial(){
 	}
 
 	if (support_sfe()){
-		showhide_div('row_sfe', 0);
+		showhide_div('row_sfe', 1);
 	}
 
 	var o1 = document.form.wan_auth_mode;
