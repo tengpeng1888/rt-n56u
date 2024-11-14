@@ -602,10 +602,7 @@ BOOLEAN PeerWpaMessageSanity(
 		{
 			DBGPRINT(RT_DEBUG_TRACE, ("Replay Counter Different in pairwise msg %d of 4-way handshake!\n", MsgType));
 		}
-		else
-		{
-			DBGPRINT(RT_DEBUG_ERROR, ("Replay Counter Different in group msg %d of 2-way handshake!\n", (MsgType - EAPOL_PAIR_MSG_4)));
-		}
+		
 		
 		hex_dump("Receive replay counter ", pMsg->KeyDesc.ReplayCounter, LEN_KEY_DESC_REPLAY);
 		hex_dump("Current replay counter ", pEntry->R_Counter, LEN_KEY_DESC_REPLAY);	
@@ -2061,17 +2058,17 @@ int RtmpPasswordHash(PSTRING password, PUCHAR ssid, INT ssidlength, PUCHAR outpu
 	Return Value:
 
 	Note:
-		Output ก๖ KDF-Length (K, label, Context) where
+		Output ยกรถ KDF-Length (K, label, Context) where
 		Input:    K, a 256-bit key derivation key
 				  label, a string identifying the purpose of the keys derived using this KDF
 				  Context, a bit string that provides context to identify the derived key
 				  Length, the length of the derived key in bits
 		Output: a Length-bit derived key
 
-		result ก๖ ""
-		iterations ก๖ (Length+255)/256 
+		result ยกรถ ""
+		iterations ยกรถ (Length+255)/256 
 		do i = 1 to iterations
-			result ก๖ result || HMAC-SHA256(K, i || label || Context || Length)
+			result ยกรถ result || HMAC-SHA256(K, i || label || Context || Length)
 		od
 		return first Length bits of result, and securely delete all unused bits
 
