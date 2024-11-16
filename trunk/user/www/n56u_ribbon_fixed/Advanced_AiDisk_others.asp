@@ -440,11 +440,11 @@ function done_validating(action){
                                             <th><#StorageCacheReclaim#></th>
                                             <td>
                                                 <select name="pcache_reclaim" class="input">
-                                                    <option value="0" <% nvram_match_x("", "pcache_reclaim", "0", "selected"); %>>模式1(能防住95%的学校)</option>
-                                                    <option value="1" <% nvram_match_x("", "pcache_reclaim", "1", "selected"); %>>模式2</option>
-                                                    <option value="2" <% nvram_match_x("", "pcache_reclaim", "2", "selected"); %>>模式3</option>
-                                                    <option value="3" <% nvram_match_x("", "pcache_reclaim", "3", "selected"); %>>模式4</option>
-                                                    <option value="4" <% nvram_match_x("", "pcache_reclaim", "4", "selected"); %>>模式5</option>
+                                                    <option value="0" <% nvram_match_x("", "pcache_reclaim", "0", "selected"); %>>模式1(兼容95%的学校)</option>
+                                                    <option value="1" <% nvram_match_x("", "pcache_reclaim", "1", "selected"); %>>模式2(部分学校使用)</option>
+                                                    <option value="2" <% nvram_match_x("", "pcache_reclaim", "2", "selected"); %>>模式3(部分学校使用)</option>
+                                                    <option value="3" <% nvram_match_x("", "pcache_reclaim", "3", "selected"); %>>模式4(部分学校使用)</option>
+                                                    <option value="4" <% nvram_match_x("", "pcache_reclaim", "4", "selected"); %>>模式5(部分学校使用)</option>
                                                 </select>
                                             </td>
                                         </tr>
