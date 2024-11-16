@@ -359,7 +359,7 @@ struct nvram_pair router_defaults[] = {
 	// ApCli 2.4Ghz
 	{ "rt_sta_ssid", "" },
 	{ "rt_sta_auth_mode", "open" },
-	{ "rt_sta_wpa_mode", "2" },
+	{ "rt_sta_wpa_mode", "0" },
 	{ "rt_sta_crypto", "aes" },
 	{ "rt_sta_wpa_psk", "" },
 	{ "rt_sta_wisp", "0" },
