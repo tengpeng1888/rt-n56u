@@ -319,7 +319,7 @@ struct nvram_pair router_defaults[] = {
 	{ "rt_macnum_x", "0" },
 	{ "rt_wdslist_x", "" },
 	{ "rt_maclist_x", "" },
-	{ "rt_wpa_mode", "0" },
+	{ "rt_wpa_mode", "2" },
 	{ "rt_stream_tx", STR(BOARD_NUM_ANT_2G_TX) },
 	{ "rt_stream_rx", STR(BOARD_NUM_ANT_2G_RX) },
 	{ "rt_preamble", "1" },
@@ -774,12 +774,12 @@ struct nvram_pair router_defaults[] = {
 
 #if defined(CONFIG_RALINK_MT7621) || (defined(CONFIG_RALINK_MT7620) && !defined(BOARD_N14U))
 #if defined(USE_MT7615_AP) || (USE_MT7915_AP) // hwnat is disabled by default
-	{ "hw_nat_mode", "3" },
+	{ "hw_nat_mode", "2" },
 #else
-	{ "hw_nat_mode", "3" },
+	{ "hw_nat_mode", "4" },
 #endif
 #else
-	{ "hw_nat_mode", "3" },
+	{ "hw_nat_mode", "1" },
 #endif
 	{ "sw_nat_mode", "0" },
 #if defined(USE_SFE)
