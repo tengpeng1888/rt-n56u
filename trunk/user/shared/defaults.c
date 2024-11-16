@@ -269,7 +269,7 @@ struct nvram_pair router_defaults[] = {
 #if defined(BOARD_HAS_2G_11AX) && BOARD_HAS_2G_11AX
 	{ "rt_gmode", "6" },			/* b/g/n/ax mixed */
 #else
-	{ "rt_gmode", "5" },			/* g/n mixed */
+	{ "rt_gmode", "5" },			/* b/g/n mixed */
 #endif
 	{ "rt_mcs_mode", "0" },
 	{ "rt_channel", "13" },
@@ -319,7 +319,7 @@ struct nvram_pair router_defaults[] = {
 	{ "rt_macnum_x", "0" },
 	{ "rt_wdslist_x", "" },
 	{ "rt_maclist_x", "" },
-	{ "rt_wpa_mode", "2" },
+	{ "rt_wpa_mode", "0" },
 	{ "rt_stream_tx", STR(BOARD_NUM_ANT_2G_TX) },
 	{ "rt_stream_rx", STR(BOARD_NUM_ANT_2G_RX) },
 	{ "rt_preamble", "1" },
