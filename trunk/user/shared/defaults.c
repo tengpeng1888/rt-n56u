@@ -772,7 +772,7 @@ struct nvram_pair router_defaults[] = {
 #endif
 #endif
 
-#if defined(CONFIG_RALINK_MT7621) || (defined(CONFIG_RALINK_MT7620) || (defined(CONFIG_RALINK_MT7628) && !defined(BOARD_N14U))
+#if defined(CONFIG_RALINK_MT7621) || (defined(CONFIG_RALINK_MT7620) || && !defined(BOARD_N14U))
 	{ "hw_nat_mode", "2" },
 #else
 	{ "hw_nat_mode", "4" },
