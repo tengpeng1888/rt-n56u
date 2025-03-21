@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "Content-type: text/plain"
+echo ""
+/bin/sh /etc/storage/detect_network.sh
