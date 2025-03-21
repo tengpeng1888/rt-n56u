@@ -270,22 +270,34 @@ function submitInternet(v){
 	document.internetForm.submit();
 }
 
-// 新增网络诊断功能
+// 优化后的网络诊断功能
 function checkInternet(){
 	var statusSpan = document.getElementById("netStatus");
-	statusSpan.innerHTML = '<span class="label">检测中...</span>';
+	statusSpan.innerHTML = '<span class="label label-default">检测中...</span>';
 	
-	$j.ajax({
-		url: "https://www.baidu.com/favicon.ico",
-		type: "HEAD",
-		timeout: 3000,
-		success: function(){
-			statusSpan.innerHTML = '<span class="label label-success">路由器已联网</span>';
-		},
-		error: function(){
-			statusSpan.innerHTML = '<span class="label label-danger">路由器未联网</span>';
-		}
-	});
+	var img = new Image();
+	var timeoutTimer;
+	
+	// 成功回调
+	img.onload = function() {
+		clearTimeout(timeoutTimer);
+		statusSpan.innerHTML = '<span class="label label-success">路由器已联网</span>';
+	};
+	
+	// 失败回调
+	img.onerror = function() {
+		clearTimeout(timeoutTimer);
+		statusSpan.innerHTML = '<span class="label label-danger">路由器未联网</span>';
+	};
+	
+	// 超时处理（5秒）
+	timeoutTimer = setTimeout(function() {
+		img.onerror = null; // 防止重复触发
+		statusSpan.innerHTML = '<span class="label label-danger">路由器未联网</span>';
+	}, 5000);
+	
+	// 发起请求（使用带时间戳的URL避免缓存）
+	img.src = "https://www.baidu.com/favicon.ico?_=" + new Date().getTime();
 }
 
 </script>
@@ -377,7 +389,7 @@ function checkInternet(){
     <th><#MAC_Address#></th>
     <td colspan="3"><span id="WANMAC"></span></td>
   </tr>
-  <!-- 新增网络诊断行 -->
+  <!-- 优化后的网络诊断行 -->
   <tr>
     <th>网络诊断</th>
     <td colspan="3">
