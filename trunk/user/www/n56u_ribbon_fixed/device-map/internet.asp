@@ -295,7 +295,7 @@ function update_network_status(){
         statusElement.textContent = '正在检测互联网...';
         statusDiv.className = 'network-status status-checking';
         
-        // 检测实际互联网连接
+        // 使用中国境内可访问的检测地址
         $j.ajax({
             url: 'https://www.baidu.com/favicon.ico',
             method: 'HEAD',
@@ -305,15 +305,26 @@ function update_network_status(){
                 statusDiv.className = 'network-status status-connected';
             },
             error: function() {
-                // 备用检测方案
+                // 备用检测：腾讯图标
                 var img = new Image();
                 img.onload = function() {
                     statusElement.textContent = '路由器已联网（互联网访问正常）';
                     statusDiv.className = 'network-status status-connected';
                 };
                 img.onerror = function() {
-                    statusElement.textContent = '路由器未联网（无互联网访问）';
-                    statusDiv.className = 'network-status status-disconnected';
+                    // 终极备用：阿里公共DNS
+                    $j.ajax({
+                        url: 'http://icanhazip.com',
+                        timeout: 3000,
+                        success: function() {
+                            statusElement.textContent = '路由器已联网（互联网访问正常）';
+                            statusDiv.className = 'network-status status-connected';
+                        },
+                        error: function() {
+                            statusElement.textContent = '路由器未联网（无互联网访问）';
+                            statusDiv.className = 'network-status status-disconnected';
+                        }
+                    });
                 };
                 img.src = 'https://www.qq.com/favicon.ico?_=' + Date.now();
             }
