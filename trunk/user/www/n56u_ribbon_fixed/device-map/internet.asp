@@ -297,7 +297,7 @@ function update_network_status(){
         
         // 检测实际互联网连接
         $j.ajax({
-            url: 'https://www.google.com/gen_204',
+            url: 'https://www.baidu.com/favicon.ico',
             method: 'HEAD',
             timeout: 3000,
             success: function() {
@@ -315,7 +315,7 @@ function update_network_status(){
                     statusElement.textContent = '路由器未联网（无互联网访问）';
                     statusDiv.className = 'network-status status-disconnected';
                 };
-                img.src = 'https://www.gstatic.com/favicon.ico?_=' + Date.now();
+                img.src = 'https://www.qq.com/favicon.ico?_=' + Date.now();
             }
         });
     } else {
