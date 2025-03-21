@@ -12,12 +12,14 @@
 <link rel="stylesheet" type="text/css" href="/bootstrap/css/main.css">
 
 <style>
+/* 新增网络诊断样式 */
 .network-status {
     padding: 8px 15px;
     border-radius: 4px;
     font-weight: bold;
     display: inline-block;
     margin-top: 5px;
+    transition: all 0.3s ease;
 }
 .status-connected {
     background-color: #dff0d8;
@@ -40,6 +42,7 @@
 
 var $j = jQuery.noConflict();
 var id_update_wanip = 0;
+var id_check_network = 0;
 var last_bytes_rx = 0;
 var last_bytes_tx = 0;
 var last_time = 0;
@@ -54,9 +57,29 @@ performance.now = (function() {
     function() { return new Date().getTime(); };
 })();
 
+// 新增：百度可达性检测函数
+function checkBaiduAccessibility(callback) {
+    var img = new Image();
+    img.src = "https://www.baidu.com/favicon.ico?_t=" + Date.now();
+    var timer = setTimeout(function() {
+        img.onload = img.onerror = null;
+        callback(false);
+    }, 3000);
+
+    img.onload = function() {
+        clearTimeout(timer);
+        callback(true);
+    };
+    img.onerror = function() {
+        clearTimeout(timer);
+        callback(false);
+    };
+}
+
 function initial(){
     flash_button();
 
+    // 原有设备支持判断
     if(!support_usb())
         $j("#domore")[0].remove(6);
 
@@ -75,8 +98,31 @@ function initial(){
 
     fill_info();
     id_update_wanip = setTimeout("update_wanip();", 2500);
+    id_check_network = setInterval(checkNetworkStatus, 5000); // 新增网络检测定时器
 }
 
+// 修改后的网络状态更新函数
+function update_network_status(isConnected){
+    var statusElement = document.getElementById('router-status-text');
+    var statusDiv = document.getElementById('network-status');
+    
+    if(isConnected){
+        statusElement.textContent = '路由器已联网（可访问互联网）';
+        statusDiv.className = 'network-status status-connected';
+    }else{
+        statusElement.textContent = '路由器未联网（互联网不可达）';
+        statusDiv.className = 'network-status status-disconnected';
+    }
+}
+
+// 新增网络状态检测
+function checkNetworkStatus() {
+    checkBaiduAccessibility(function(success) {
+        update_network_status(success);
+    });
+}
+
+/* 保留所有原始功能函数 */
 function bytesToIEC(bytes, precision){
     var absval = Math.abs(bytes);
     var kilobyte = 1024;
@@ -262,7 +308,6 @@ function fill_info(){
     $("WANGW4").innerHTML = wanlink_gw4_wan();
     $("WANDNS").innerHTML = wanlink_dns();
     $("WANMAC").innerHTML = wanlink_mac();
-    update_network_status(); // 新增状态更新
 }
 
 function update_wanip(){
@@ -279,20 +324,6 @@ function update_wanip(){
             id_update_wanip = setTimeout("update_wanip();", 2500);
         }
     });
-}
-
-function update_network_status(){
-    var scode = wanlink_status();
-    var statusElement = document.getElementById('router-status-text');
-    var statusDiv = document.getElementById('network-status');
-    
-    if(scode == 0){
-        statusElement.textContent = '路由器已联网';
-        statusDiv.className = 'network-status status-connected';
-    }else{
-        statusElement.textContent = '路由器未联网';
-        statusDiv.className = 'network-status status-disconnected';
-    }
 }
 
 function submitInternet(v){
@@ -397,7 +428,7 @@ function submitInternet(v){
     <th>网络诊断</th>
     <td colspan="3">
       <div id="network-status" class="network-status">
-        <span id="router-status-text"></span>
+        <span id="router-status-text">正在检测网络状态...</span>
       </div>
     </td>
   </tr>
