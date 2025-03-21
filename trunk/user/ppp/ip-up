@@ -1,0 +1,3 @@
+# trunk/user/ppp/ip-up
+#!/bin/sh
+logger -t "PPPOE状态" "连接$6成功，分配IP：$4"
