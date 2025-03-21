@@ -29,11 +29,6 @@
     color: #a94442;
     border: 1px solid #ebccd1;
 }
-.status-checking {
-    background-color: #d9edf7;
-    color: #31708f;
-    border: 1px solid #bce8f1;
-}
 </style>
 
 <script type="text/javascript" src="/jquery.js"></script>
@@ -292,10 +287,7 @@ function update_network_status(){
     var statusDiv = document.getElementById('network-status');
     
     if(scode == 0){
-        statusElement.textContent = '正在检测互联网...';
-        statusDiv.className = 'network-status status-checking';
-        
-        // 使用中国境内可访问的检测地址
+        // 直接检测互联网状态，不显示中间状态
         $j.ajax({
             url: 'https://www.baidu.com/favicon.ico',
             method: 'HEAD',
@@ -305,14 +297,12 @@ function update_network_status(){
                 statusDiv.className = 'network-status status-connected';
             },
             error: function() {
-                // 备用检测：腾讯图标
                 var img = new Image();
                 img.onload = function() {
                     statusElement.textContent = '路由器已联网（互联网访问正常）';
                     statusDiv.className = 'network-status status-connected';
                 };
                 img.onerror = function() {
-                    // 终极备用：阿里公共DNS
                     $j.ajax({
                         url: 'http://icanhazip.com',
                         timeout: 3000,
