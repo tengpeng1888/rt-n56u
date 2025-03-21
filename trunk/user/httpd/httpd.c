@@ -832,19 +832,19 @@ set_preferred_lang(char *cur)
 	return 0;
 }
 
-/* 新增辅助函数：检查主机名是否有效 */
+/* 新增输入验证函数：检查主机名是否有效 */
 static int
-is_valid_hostname(const char *hostname)
+is_valid_hostname(const char *str)
 {
-    const char *p;
-    if (!hostname || !*hostname)
-        return 0;
-    
-    for (p = hostname; *p; p++) {
-        if (!isalnum(*p) && *p != '.' && *p != '-')
+    const char *p = str;
+    int len = 0;
+    while (*p) {
+        if (!isalnum(*p) && *p != '.' && *p != '-') 
             return 0;
+        p++;
+        len++;
     }
-    return 1;
+    return (len > 0 && len <= 64);
 }
 
 /* 新增函数：处理Ping请求 */
@@ -857,7 +857,7 @@ handle_ping_request(FILE *stream, const char *query)
 
     /* 从查询字符串中提取目标地址 */
     if (query) {
-        char *p = strstr(query, "addr="); // 修改为 "addr=" 以匹配前端
+        char *p = strstr(query, "addr=");
         if (p) {
             strncpy(target, p + 5, sizeof(target) - 1);
         }
