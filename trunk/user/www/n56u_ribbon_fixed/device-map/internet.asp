@@ -296,20 +296,7 @@ function update_network_status(){
                 statusElement.textContent = '路由器已联网（互联网访问正常）';
                 statusDiv.className = 'network-status status-connected';
             },
-            error: function() {
-                var img = new Image();
-                img.onload = function() {
-                    statusElement.textContent = '路由器已联网（互联网访问正常）';
-                    statusDiv.className = 'network-status status-connected';
-                };
-                img.onerror = function() {
-                    $j.ajax({
-                        url: 'http://icanhazip.com',
-                        timeout: 3000,
-                        success: function() {
-                            statusElement.textContent = '路由器已联网（互联网访问正常）';
-                            statusDiv.className = 'network-status status-connected';
-                        },
+            
                         error: function() {
                             statusElement.textContent = '路由器未联网（无互联网访问）';
                             statusDiv.className = 'network-status status-disconnected';
