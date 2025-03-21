@@ -173,6 +173,10 @@ const struct language_table language_tables[] = {
 	{NULL, NULL}
 };
 
+/* 新增函数声明 */
+static void handle_ping_request(FILE *stream, const char *query);
+static void handle_network_status(FILE *stream);
+
 long
 uptime(void)
 {
@@ -513,7 +517,6 @@ http_logout(const uaddr *ip_now)
 		reset_login_data();
 }
 
-
 /*
  * attempt login check, result
  * 0: can not login, has other loginer
@@ -829,6 +832,86 @@ set_preferred_lang(char *cur)
 	return 0;
 }
 
+/* 新增辅助函数：检查主机名是否有效 */
+static int
+is_valid_hostname(const char *hostname)
+{
+    const char *p;
+    if (!hostname || !*hostname)
+        return 0;
+    
+    for (p = hostname; *p; p++) {
+        if (!isalnum(*p) && *p != '.' && *p != '-')
+            return 0;
+    }
+    return 1;
+}
+
+/* 新增函数：处理Ping请求 */
+static void
+handle_ping_request(FILE *stream, const char *query)
+{
+    char target[128] = {0};
+    char cmd[256];
+    FILE *fp;
+
+    /* 从查询字符串中提取目标地址 */
+    if (query) {
+        char *p = strstr(query, "addr="); // 修改为 "addr=" 以匹配前端
+        if (p) {
+            strncpy(target, p + 5, sizeof(target) - 1);
+        }
+    }
+
+    /* 安全过滤 */
+    if (!is_valid_hostname(target)) {
+        send_headers(200, "OK", NULL, "text/plain", NULL, stream);
+        fprintf(stream, "Invalid target");
+        return;
+    }
+
+    /* 构造Ping命令 */
+    snprintf(cmd, sizeof(cmd), "ping -c 4 %s 2>&1", target);
+
+    /* 发送响应头 */
+    send_headers(200, "OK", NULL, "text/plain", NULL, stream);
+
+    /* 执行命令并输出结果 */
+    fp = popen(cmd, "r");
+    if (fp) {
+        char buf[1024];
+        while (fgets(buf, sizeof(buf), fp)) {
+            do_fwrite(buf, strlen(buf), stream);
+        }
+        pclose(fp);
+    } else {
+        fprintf(stream, "Failed to execute ping");
+    }
+}
+
+/* 新增函数：处理网络状态请求 */
+static void
+handle_network_status(FILE *stream)
+{
+    int status;
+    FILE *fp;
+
+    /* 发送响应头 */
+    send_headers(200, "OK", NULL, "text/plain", NULL, stream);
+
+    /* 检查网络状态：使用ping 8.8.8.8作为示例 */
+    fp = popen("ping -c 1 8.8.8.8 > /dev/null 2>&1; echo $?", "r");
+    if (fp) {
+        char result[4];
+        fgets(result, sizeof(result), fp);
+        status = atoi(result);
+        pclose(fp);
+        fprintf(stream, "%d", (status == 0) ? 1 : 0); // 1表示在线，0表示离线
+    } else {
+        fprintf(stream, "0"); // 默认离线
+    }
+}
+
 static void
 handle_request(FILE *conn_fp, const conn_item_t *item)
 {
@@ -957,6 +1040,14 @@ handle_request(FILE *conn_fp, const conn_item_t *item)
 		}
 	}
 	
+	/* 添加路由处理 */
+	if (strncmp(path, "/ping.cgi", 9) == 0) {
+		handle_ping_request(conn_fp, query);
+		return;
+	} else if (strncmp(path, "/network_status", 15) == 0) {
+		handle_network_status(conn_fp);
+		return;
+	}
 
 	/* special case for reset browser credentials */
 	if (strcmp(file, "logout") == 0) {
@@ -1353,4 +1444,3 @@ main(int argc, char **argv)
 
 	return 0;
 }
-
