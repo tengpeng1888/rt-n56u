@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>网络诊断 - Padavan</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; color: white; text-align: center; border-radius: 5px; }
+        .online { background: #28a745; }
+        .offline { background: #dc3545; }
+        .ping-box { margin-top: 20px; }
+        #ping-result { margin-top: 10px; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h2>网络诊断</h2>
+    <div id="status" class="status">检查中...</div>
+    <div class="ping-box">
+        <input type="text" id="ping-addr" value="www.baidu.com">
+        <button onclick="doPing()">Ping</button>
+        <div id="ping-result"></div>
+    </div>
+
+    <script>
+        // 检查网络状态
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/network_status.cgi', true);
+        xhr.onload = function() {
+            var status = document.getElementById('status');
+            if (xhr.responseText.trim() === '1') {
+                status.textContent = '路由器已联网';
+                status.className = 'status online';
+            } else {
+                status.textContent = '路由器未联网';
+                status.className = 'status offline';
+            }
+        };
+        xhr.onerror = function() {
+            document.getElementById('status').textContent = '检查失败';
+            document.getElementById('status').className = 'status offline';
+        };
+        xhr.send();
+
+        // 执行Ping
+        function doPing() {
+            var addr = document.getElementById('ping-addr').value;
+            var result = document.getElementById('ping-result');
+            result.textContent = 'Pinging ' + addr + '...';
+            var xhrPing = new XMLHttpRequest();
+            xhrPing.open('GET', '/ping.cgi?addr=' + encodeURIComponent(addr), true);
+            xhrPing.onload = function() {
+                result.textContent = xhrPing.responseText;
+            };
+            xhrPing.onerror = function() {
+                result.textContent = 'Ping失败';
+            };
+            xhrPing.send();
+        }
+    </script>
+</body>
+</html>
