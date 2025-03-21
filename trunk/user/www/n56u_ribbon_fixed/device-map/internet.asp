@@ -291,7 +291,7 @@ function update_network_status(){
         $j.ajax({
             url: 'https://www.baidu.com/favicon.ico',
             method: 'HEAD',
-            timeout: 3000,
+            timeout: 1000,
             success: function() {
                 statusElement.textContent = '路由器已联网（互联网访问正常）';
                 statusDiv.className = 'network-status status-connected';
@@ -307,7 +307,7 @@ function update_network_status(){
             }
         });
     } else {
-        statusElement.textContent = '路由器未联网';
+        statusElement.textContent = '路由器未联网（WAN口网线未连接）';
         statusDiv.className = 'network-status status-disconnected';
     }
 }
