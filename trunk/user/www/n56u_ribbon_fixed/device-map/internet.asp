@@ -44,12 +44,9 @@
 <% wanlink(); %>
 
 var $j = jQuery.noConflict();
-var id_update_wanip = 0;
-var last_bytes_rx = 0;
-var last_bytes_tx = 0;
-var last_time = 0;
 var networkCheckTimeout = null;
 var resultDuration = 30000; // 30秒
+var currentCheck = null; // 当前检测请求
 
 window.performance = window.performance || {};
 performance.now = (function() {
@@ -82,46 +79,75 @@ function initial(){
 
     fill_info();
     checkNetworkStatus(true);
-    window.addEventListener('online', handleNetworkChange);
-    window.addEventListener('offline', handleNetworkChange);
+    
+    // 增强型网络监听
+    window.addEventListener('online', () => handleNetworkChange(true));
+    window.addEventListener('offline', () => handleNetworkChange(false));
+    setInterval(checkPhysicalLink, 1000); // 每秒检测物理连接
 }
 
-function handleNetworkChange() {
+function checkPhysicalLink() {
+    // 通过WAN状态判断物理连接
+    const isPhysicallyConnected = (wanlink_status() !== 0);
+    const statusDiv = document.getElementById('network-status');
+    
+    if(!isPhysicallyConnected) {
+        updateStatus('disconnected', true);
+        if(currentCheck) {
+            currentCheck.abort(); // 中止正在进行的检测
+            currentCheck = null;
+        }
+    }
+}
+
+function handleNetworkChange(online) {
     clearTimeout(networkCheckTimeout);
-    checkNetworkStatus(true);
+    if(online) {
+        checkNetworkStatus(true);
+    } else {
+        updateStatus('disconnected', true);
+    }
 }
 
 function checkNetworkStatus(forceUpdate) {
-    var statusElement = document.getElementById('router-status-text');
-    var statusDiv = document.getElementById('network-status');
+    const statusElement = document.getElementById('router-status-text');
+    const statusDiv = document.getElementById('network-status');
     
+    // 先检查物理连接状态
+    if(wanlink_status() === 0) {
+        updateStatus('disconnected', true);
+        return;
+    }
+
     if(forceUpdate) {
         statusElement.textContent = '正在检测互联网...';
         statusDiv.className = 'network-status status-checking';
     }
     
-    $j.ajax({
-        url: 'https://www.baidu.com/favicon.ico',
+    // 中止之前的检测
+    if(currentCheck) currentCheck.abort();
+
+    // 使用中国境内检测地址
+    currentCheck = $j.ajax({
+        url: 'https://www.baidu.com/favicon.ico?_=' + Date.now(),
         method: 'HEAD',
-        timeout: 3000,
-        success: function() {
-            updateStatus('connected');
-        },
-        error: function() {
-            var img = new Image();
-            img.onload = function() {
-                updateStatus('connected');
-            };
-            img.onerror = function() {
+        timeout: 2000,
+        success: () => updateStatus('connected'),
+        error: (xhr) => {
+            if(xhr.status === 0) return; // 请求被中止
+            
+            // 备用检测：腾讯图标
+            const img = new Image();
+            img.timeout = 2000;
+            img.onload = () => updateStatus('connected');
+            img.onerror = () => {
+                // 终极备用：HTTPS检测
                 $j.ajax({
-                    url: 'http://icanhazip.com',
-                    timeout: 3000,
-                    success: function() {
-                        updateStatus('connected');
-                    },
-                    error: function() {
-                        updateStatus('disconnected');
-                    }
+                    url: 'https://www.qq.com/favicon.ico?_=' + Date.now(),
+                    method: 'HEAD',
+                    timeout: 2000,
+                    success: () => updateStatus('connected'),
+                    error: () => updateStatus('disconnected')
                 });
             };
             img.src = 'https://www.qq.com/favicon.ico?_=' + Date.now();
@@ -129,9 +155,9 @@ function checkNetworkStatus(forceUpdate) {
     });
 }
 
-function updateStatus(status) {
-    var statusElement = document.getElementById('router-status-text');
-    var statusDiv = document.getElementById('network-status');
+function updateStatus(status, isPhysicalDisconnect = false) {
+    const statusElement = document.getElementById('router-status-text');
+    const statusDiv = document.getElementById('network-status');
     
     clearTimeout(networkCheckTimeout);
     
@@ -139,16 +165,24 @@ function updateStatus(status) {
         statusElement.textContent = '路由器已联网（互联网访问正常）';
         statusDiv.className = 'network-status status-connected';
     } else {
-        statusElement.textContent = '路由器未联网（无互联网访问）';
+        statusElement.textContent = isPhysicalDisconnect 
+            ? '网络未连接（物理断开）' 
+            : '路由器未联网（无互联网访问）';
         statusDiv.className = 'network-status status-disconnected';
     }
     
-    networkCheckTimeout = setTimeout(function() {
-        statusElement.textContent = '网络状态检测已刷新';
+    // 30秒后自动刷新
+    networkCheckTimeout = setTimeout(() => {
+        statusElement.textContent = '正在重新检测网络状态...';
         statusDiv.className = 'network-status status-checking';
+        checkNetworkStatus(true);
     }, resultDuration);
 }
 
+// 保留原有功能函数（bytesToIEC、kbitsToRate等）
+// ...（此处保留所有原始功能函数，保持内容完整）...
+
+// ========== 以下为原始功能函数 ========== //
 function bytesToIEC(bytes, precision){
     var absval = Math.abs(bytes);
     var kilobyte = 1024;
