@@ -307,7 +307,7 @@ function update_network_status(){
             }
         });
     } else {
-        statusElement.textContent = '路由器未联网（WAN口网线未连接）';
+        statusElement.textContent = '路由器未联网（无互联网访问）';
         statusDiv.className = 'network-status status-disconnected';
     }
 }
