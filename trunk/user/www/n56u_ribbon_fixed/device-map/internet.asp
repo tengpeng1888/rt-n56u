@@ -45,11 +45,11 @@
 
 var $j = jQuery.noConflict();
 var id_update_wanip = 0;
-var checkInterval = 30000; // 30秒检测间隔
-var networkCheckTimer = null;
 var last_bytes_rx = 0;
 var last_bytes_tx = 0;
 var last_time = 0;
+var networkCheckTimeout = null;
+var resultDuration = 30000; // 30秒
 
 window.performance = window.performance || {};
 performance.now = (function() {
@@ -81,95 +81,259 @@ function initial(){
     }
 
     fill_info();
-    id_update_wanip = setTimeout("update_wanip();", 2500);
-    
-    // 初始化网络检测
-    startNetworkCheck();
+    checkNetworkStatus(true);
+    window.addEventListener('online', handleNetworkChange);
+    window.addEventListener('offline', handleNetworkChange);
 }
 
-//=============== 新增网络检测逻辑 ===============//
-var isChecking = false; // 检测锁
-
-function startNetworkCheck() {
-    // 立即执行首次检测
-    update_network_status();
-    // 设置周期性检测
-    networkCheckTimer = setInterval(update_network_status, checkInterval);
+function handleNetworkChange() {
+    clearTimeout(networkCheckTimeout);
+    checkNetworkStatus(true);
 }
 
-function stopNetworkCheck() {
-    clearInterval(networkCheckTimer);
-}
-
-function update_network_status(){
-    if(isChecking) return;
-    isChecking = true;
-    
-    var scode = wanlink_status();
+function checkNetworkStatus(forceUpdate) {
     var statusElement = document.getElementById('router-status-text');
     var statusDiv = document.getElementById('network-status');
     
-    statusElement.textContent = '正在检测互联网...';
-    statusDiv.className = 'network-status status-checking';
+    if(forceUpdate) {
+        statusElement.textContent = '正在检测互联网...';
+        statusDiv.className = 'network-status status-checking';
+    }
     
-    // 三阶段检测
-    checkBaidu().then(() => {
-        setConnectedStatus(statusElement, statusDiv);
-    }).catch(() => {
-        checkQQ().then(() => {
-            setConnectedStatus(statusElement, statusDiv);
-        }).catch(() => {
-            checkPublicIP().then(() => {
-                setConnectedStatus(statusElement, statusDiv);
-            }).catch(() => {
-                setDisconnectedStatus(statusElement, statusDiv);
-            });
-        });
-    }).finally(() => {
-        isChecking = false;
+    $j.ajax({
+        url: 'https://www.baidu.com/favicon.ico',
+        method: 'HEAD',
+        timeout: 3000,
+        success: function() {
+            updateStatus('connected');
+        },
+        error: function() {
+            var img = new Image();
+            img.onload = function() {
+                updateStatus('connected');
+            };
+            img.onerror = function() {
+                $j.ajax({
+                    url: 'http://icanhazip.com',
+                    timeout: 3000,
+                    success: function() {
+                        updateStatus('connected');
+                    },
+                    error: function() {
+                        updateStatus('disconnected');
+                    }
+                });
+            };
+            img.src = 'https://www.qq.com/favicon.ico?_=' + Date.now();
+        }
     });
 }
 
-function checkBaidu() {
-    return new Promise((resolve, reject) => {
-        $j.ajax({
-            url: 'https://www.baidu.com/favicon.ico',
-            method: 'HEAD',
-            timeout: 3000,
-            success: resolve,
-            error: reject
-        });
-    });
+function updateStatus(status) {
+    var statusElement = document.getElementById('router-status-text');
+    var statusDiv = document.getElementById('network-status');
+    
+    clearTimeout(networkCheckTimeout);
+    
+    if(status === 'connected') {
+        statusElement.textContent = '路由器已联网（互联网访问正常）';
+        statusDiv.className = 'network-status status-connected';
+    } else {
+        statusElement.textContent = '路由器未联网（无互联网访问）';
+        statusDiv.className = 'network-status status-disconnected';
+    }
+    
+    networkCheckTimeout = setTimeout(function() {
+        statusElement.textContent = '网络状态检测已刷新';
+        statusDiv.className = 'network-status status-checking';
+    }, resultDuration);
 }
 
-function checkQQ() {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = 'https://www.qq.com/favicon.ico?_=' + Date.now();
-    });
+function bytesToIEC(bytes, precision){
+    var absval = Math.abs(bytes);
+    var kilobyte = 1024;
+    var megabyte = kilobyte * 1024;
+    var gigabyte = megabyte * 1024;
+    var terabyte = gigabyte * 1024;
+    var petabyte = terabyte * 1024;
+
+    if (absval < kilobyte)
+        return bytes + ' B';
+    else if (absval < megabyte)
+        return (bytes / kilobyte).toFixed(precision) + ' KiB';
+    else if (absval < gigabyte)
+        return (bytes / megabyte).toFixed(precision) + ' MiB';
+    else if (absval < terabyte)
+        return (bytes / gigabyte).toFixed(precision) + ' GiB';
+    else if (absval < petabyte)
+        return (bytes / terabyte).toFixed(precision) + ' TiB';
+    else
+        return (bytes / petabyte).toFixed(precision) + ' PiB';
 }
 
-function checkPublicIP() {
-    return new Promise((resolve, reject) => {
-        $j.ajax({
-            url: 'http://icanhazip.com',
-            timeout: 3000,
-            success: resolve,
-            error: reject
-        });
-    });
+function kbitsToRate(kbits, precision){
+    var absval = Math.abs(kbits);
+    var megabit = 1000;
+    var gigabit = megabit * 1000;
+
+    if (absval < megabit)
+        return kbits + ' Kbps';
+    else if (absval < gigabit)
+        return (kbits / megabit).toFixed(precision) + ' Mbps';
+    else
+        return (kbits / gigabit).toFixed(precision) + ' Gbps';
 }
 
-function setConnectedStatus(element, div) {
-    element.textContent = '路由器已联网（互联网访问正常）';
-    div.className = 'network-status status-connected';
+function secondsToDHM(seconds){
+    var days, hours, minutes;
+
+    days = Math.floor(seconds / 86400);
+    minutes = Math.floor(seconds / 60);
+    hours = (Math.floor(minutes / 60)) % 24;
+    minutes = minutes % 60;
+
+    hours = hours < 10 ? ('0'+hours) : hours;
+    minutes = minutes < 10 ? ('0'+minutes) : minutes;
+
+    return days+"<#Day#>".substring(0,1)+" "+hours+"<#Hour#>".substring(0,1)+" "+minutes+"<#Minute#>".substring(0,1);
 }
 
-function setDisconnectedStatus(element, div) {
-    element.textContent = '路由器未联网（无互联网访问）';
-    div.className = 'network-status status-disconnected';
+function fill_status(scode,wtype){
+    var stext = "Unknown";
+    if (scode == 0)
+        stext = "<#InetState0#>";
+    else if (scode == 1)
+        stext = "<#InetState1#>";
+    else if (scode == 2)
+        stext = "<#InetState2#>";
+    else if (scode == 3)
+        stext = "<#InetState3#>";
+    else if (scode == 4)
+        stext = "<#InetState4#>";
+    else if (scode == 5)
+        stext = "<#InetState5#>";
+    else if (scode == 6)
+        stext = "<#InetState6#>";
+    else if (scode == 7)
+        stext = "<#InetState7#>";
+    else if (scode == 8)
+        stext = "<#InetState8#>";
+    else if (scode == 9)
+        stext = "<#InetState9#>";
+    $("wan_status").innerHTML = '<span class="label label-' + (scode != 0 ? 'warning' : 'success') + '">' + stext + '</span>';
+
+    var wtext = wtype;
+    if(wtype == 'Automatic IP')
+        wtext = 'IPoE: <#BOP_ctype_title1#>';
+    else if(wtype == 'Static IP')
+        wtext = 'IPoE: <#BOP_ctype_title5#>';
+    $("WANType").innerHTML = wtext;
+}
+
+function fill_uptime(uptime,dltime){
+    if (uptime > 0){
+        $("WANTime").innerHTML = secondsToDHM(uptime);
+        $("row_uptime").style.display = "";
+        if (dltime > 0){
+            $("WANLease").innerHTML = secondsToDHM(dltime);
+            $("row_dltime").style.display = "";
+        }else
+            $("row_dltime").style.display = "none";
+    }else{
+        $("row_dltime").style.display = "none";
+        $("row_uptime").style.display = "none";
+    }
+}
+
+function fill_phylink(ether_link,apcli_link){
+    $("WANEther").innerHTML = ether_link;
+    $("WANAPCli").innerHTML = apcli_link;
+    if (ether_link != '')
+        $("row_link_ether").style.display = "";
+    else
+        $("row_link_ether").style.display = "none";
+    if (apcli_link != '')
+        $("row_link_apcli").style.display = "";
+    else
+        $("row_link_apcli").style.display = "none";
+}
+
+function fill_man_addr4(ip,gw){
+    if (ip != ''){
+        $("MANIP4").innerHTML = ip;
+        $("MANGW4").innerHTML = gw;
+        $("row_man_ip4").style.display = "";
+        $("row_man_gw4").style.display = "";
+    }else{
+        $("row_man_ip4").style.display = "none";
+        $("row_man_gw4").style.display = "none";
+    }
+}
+
+function fill_wan_addr6(wan_ip,lan_ip){
+    if (wan_ip != ''){
+        $("WANIP6").innerHTML = wan_ip;
+        $("row_wan_ip6").style.display = "";
+    }else
+        $("row_wan_ip6").style.display = "none";
+    if (lan_ip != ''){
+        $("LANIP6").innerHTML = lan_ip;
+        $("row_lan_ip6").style.display = "";
+    }else
+        $("row_lan_ip6").style.display = "none";
+}
+
+function fill_wan_bytes(rx,tx,now){
+    if (rx > 0 || tx > 0){
+        var diff_rx = 0;
+        var diff_tx = 0;
+        if (last_time > 0 && now > last_time){
+            var diff_time = (now - last_time);
+            if (last_bytes_rx > 0){
+                if (rx < last_bytes_rx){
+                    if (last_bytes_rx <= 0xFFFFFFFF && last_bytes_rx > 0xE0000000)
+                        diff_rx = (0xFFFFFFFF - last_bytes_rx) + rx;
+                }else
+                    diff_rx = rx - last_bytes_rx;
+                diff_rx = Math.floor(diff_rx * 8 / diff_time);
+            }
+            if (last_bytes_tx > 0){
+                if (tx < last_bytes_tx){
+                    if (last_bytes_tx <= 0xFFFFFFFF && last_bytes_tx > 0xE0000000)
+                        diff_tx = (0xFFFFFFFF - last_bytes_tx) + tx;
+                }else
+                    diff_tx = tx - last_bytes_tx;
+                diff_tx = Math.floor(diff_tx * 8 / diff_time);
+            }
+        }
+        last_bytes_rx = rx;
+        last_bytes_tx = tx;
+        last_time = now;
+        
+        $("WANBytesRX").innerHTML = '<i class="icon-arrow-down"></i>'+bytesToIEC(rx,2);
+        $("WANBytesTX").innerHTML = '<i class="icon-arrow-up"></i>'+bytesToIEC(tx,2);
+        $("WANBRateRX").innerHTML = '<i class="icon-arrow-down"></i>'+kbitsToRate(diff_rx,2);
+        $("WANBRateTX").innerHTML = '<i class="icon-arrow-up"></i>'+kbitsToRate(diff_tx,2);
+        $("row_bytes").style.display = "";
+        $("row_brate").style.display = "";
+    }else{
+        $("row_bytes").style.display = "none";
+        $("row_brate").style.display = "none";
+    }
+}
+
+function fill_info(){
+    var now = performance.now();
+    fill_status(wanlink_status(), wanlink_type());
+    fill_uptime(wanlink_uptime(), wanlink_dltime());
+    fill_phylink(wanlink_etherlink(), wanlink_apclilink());
+    fill_man_addr4(wanlink_ip4_man(), wanlink_gw4_man());
+    fill_wan_addr6(wanlink_ip6_wan(), wanlink_ip6_lan());
+    fill_wan_bytes(wanlink_bytes_rx(), wanlink_bytes_tx(), now);
+    $("WANIP4").innerHTML = wanlink_ip4_wan();
+    $("WANGW4").innerHTML = wanlink_gw4_wan();
+    $("WANDNS").innerHTML = wanlink_dns();
+    $("WANMAC").innerHTML = wanlink_mac();
 }
 
 function submitInternet(v){
@@ -185,6 +349,7 @@ function submitInternet(v){
 
 <body class="body_iframe" onload="initial();">
 <table width="100%" align="center" cellpadding="4" cellspacing="0" class="table" id="tbl_info">
+  <!-- 保持原始HTML结构 -->
   <tr>
     <th width="50%" style="border-top: 0 none;"><#InetControl#></th>
     <td style="border-top: 0 none;" colspan="3">
@@ -269,7 +434,6 @@ function submitInternet(v){
     <th><#MAC_Address#></th>
     <td colspan="3"><span id="WANMAC"></span></td>
   </tr>
-  <!-- 新增网络诊断行 -->
   <tr id="row_network_status">
     <th>网络诊断</th>
     <td colspan="3">
