@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>网络状态监控</title>
+<title></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
@@ -12,16 +12,12 @@
 <link rel="stylesheet" type="text/css" href="/bootstrap/css/main.css">
 
 <style>
-/* 新增网络诊断样式 */
 .network-status {
     padding: 8px 15px;
     border-radius: 4px;
     font-weight: bold;
     display: inline-block;
     margin-top: 5px;
-    transition: all 0.3s ease;
-    min-width: 240px;
-    text-align: center;
 }
 .status-connected {
     background-color: #dff0d8;
@@ -34,9 +30,9 @@
     border: 1px solid #ebccd1;
 }
 .status-checking {
-    background-color: #fcf8e3;
-    color: #8a6d3b;
-    border: 1px solid #faebcc;
+    background-color: #d9edf7;
+    color: #31708f;
+    border: 1px solid #bce8f1;
 }
 </style>
 
@@ -53,14 +49,6 @@ var last_bytes_rx = 0;
 var last_bytes_tx = 0;
 var last_time = 0;
 
-// 新增状态检测变量
-var networkStatus = {
-    local: false,
-    internet: null,
-    lastCheck: 0
-};
-var checkInterval = 2000; // 2秒检测间隔
-
 window.performance = window.performance || {};
 performance.now = (function() {
     return performance.now ||
@@ -70,85 +58,6 @@ performance.now = (function() {
     performance.webkitNow ||
     function() { return new Date().getTime(); };
 })();
-
-// 新增百度可达性检测函数
-function checkInternetAccess() {
-    return new Promise((resolve) => {
-        const testImage = new Image();
-        const uniqueURL = 'https://www.baidu.com/favicon.ico?_=' + Date.now();
-        let timedOut = false;
-
-        const timeoutId = setTimeout(() => {
-            timedOut = true;
-            resolve(false);
-        }, 1800);
-
-        testImage.onload = () => {
-            if (!timedOut) {
-                clearTimeout(timeoutId);
-                resolve(true);
-            }
-        };
-
-        testImage.onerror = () => {
-            if (!timedOut) {
-                clearTimeout(timeoutId);
-                resolve(false);
-            }
-        };
-
-        testImage.src = uniqueURL;
-    });
-}
-
-// 新增状态更新函数
-function updateNetworkDisplay() {
-    const statusDiv = document.getElementById('network-status');
-    const statusText = document.getElementById('router-status-text');
-    
-    if (!networkStatus.local) {
-        statusDiv.className = 'network-status status-disconnected';
-        statusText.innerHTML = '<i class="icon-warning-sign"></i> 本地连接已断开';
-        return;
-    }
-
-    switch(networkStatus.internet) {
-        case true:
-            statusDiv.className = 'network-status status-connected';
-            statusText.innerHTML = '<i class="icon-ok-sign"></i> 互联网连接正常';
-            break;
-        case false:
-            statusDiv.className = 'network-status status-disconnected';
-            statusText.innerHTML = '<i class="icon-remove-sign"></i> 互联网不可达';
-            break;
-        default:
-            statusDiv.className = 'network-status status-checking';
-            statusText.innerHTML = '<i class="icon-refresh"></i> 正在检测...';
-    }
-}
-
-// 新增状态检测主逻辑
-async function performNetworkCheck() {
-    const newLocalStatus = wanlink_status() === 0;
-    
-    // 本地状态变化立即更新
-    if (newLocalStatus !== networkStatus.local) {
-        networkStatus.local = newLocalStatus;
-        networkStatus.internet = null;
-        updateNetworkDisplay();
-    }
-
-    if (networkStatus.local) {
-        try {
-            networkStatus.internet = null;
-            updateNetworkDisplay();
-            networkStatus.internet = await checkInternetAccess();
-        } catch {
-            networkStatus.internet = false;
-        }
-        updateNetworkDisplay();
-    }
-}
 
 function initial(){
     flash_button();
@@ -170,15 +79,9 @@ function initial(){
     }
 
     fill_info();
-    
-    // 修改定时器逻辑
-    id_update_wanip = setInterval(() => {
-        fill_info();
-        performNetworkCheck();
-    }, checkInterval);
+    id_update_wanip = setTimeout("update_wanip();", 2500);
 }
 
-/* 保留所有原始函数 */
 function bytesToIEC(bytes, precision){
     var absval = Math.abs(bytes);
     var kilobyte = 1024;
@@ -364,6 +267,7 @@ function fill_info(){
     $("WANGW4").innerHTML = wanlink_gw4_wan();
     $("WANDNS").innerHTML = wanlink_dns();
     $("WANMAC").innerHTML = wanlink_mac();
+    update_network_status();
 }
 
 function update_wanip(){
@@ -377,9 +281,47 @@ function update_wanip(){
         },
         success: function(response){
             fill_info();
-            id_update_wanip = setTimeout("update_wanip();", 2000);
+            id_update_wanip = setTimeout("update_wanip();", 2500);
         }
     });
+}
+
+function update_network_status(){
+    var scode = wanlink_status();
+    var statusElement = document.getElementById('router-status-text');
+    var statusDiv = document.getElementById('network-status');
+    
+    if(scode == 0){
+        statusElement.textContent = '正在检测互联网...';
+        statusDiv.className = 'network-status status-checking';
+        
+        // 检测实际互联网连接
+        $j.ajax({
+            url: 'https://www.google.com/gen_204',
+            method: 'HEAD',
+            timeout: 3000,
+            success: function() {
+                statusElement.textContent = '路由器已联网（互联网访问正常）';
+                statusDiv.className = 'network-status status-connected';
+            },
+            error: function() {
+                // 备用检测方案
+                var img = new Image();
+                img.onload = function() {
+                    statusElement.textContent = '路由器已联网（互联网访问正常）';
+                    statusDiv.className = 'network-status status-connected';
+                };
+                img.onerror = function() {
+                    statusElement.textContent = '路由器未联网（无互联网访问）';
+                    statusDiv.className = 'network-status status-disconnected';
+                };
+                img.src = 'https://www.gstatic.com/favicon.ico?_=' + Date.now();
+            }
+        });
+    } else {
+        statusElement.textContent = '路由器未联网';
+        statusDiv.className = 'network-status status-disconnected';
+    }
 }
 
 function submitInternet(v){
@@ -479,12 +421,11 @@ function submitInternet(v){
     <th><#MAC_Address#></th>
     <td colspan="3"><span id="WANMAC"></span></td>
   </tr>
-  <!-- 新增网络诊断行 -->
   <tr id="row_network_status">
-    <th>实时网络状态</th>
+    <th>网络诊断</th>
     <td colspan="3">
       <div id="network-status" class="network-status">
-        <span id="router-status-text"><i class="icon-refresh"></i> 正在初始化...</span>
+        <span id="router-status-text"></span>
       </div>
     </td>
   </tr>
