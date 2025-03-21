@@ -1,0 +1,10 @@
+/* 新建 www/style/network-diag.css */
+.led-online { background: #0f0; }
+.led-offline { background: #f00; }
+.ping-box { margin: 15px 0; }
+#ping-results {
+    border: 1px solid #ddd;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
