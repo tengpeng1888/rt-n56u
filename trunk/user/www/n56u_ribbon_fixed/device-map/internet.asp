@@ -271,33 +271,49 @@ function submitInternet(v){
 }
 
 function checkNetwork(){
-	// 首先检查 WAN 连接状态
-	var wanStatus = wanlink_status();
-	if(wanStatus == 0 && wanlink_ip4_wan() != '') {  // status 0 表示已连接，且有 WAN IP
-		$("network_status").innerHTML = '<span style="color: green">路由器已联网</span>';
-	} else {
-		// 如果 WAN 状态不可靠，再尝试访问外部网络
+	// 定义要 ping 的国内网站列表
+	var sites = [
+		"www.baidu.com",
+		"www.aliyun.com",
+		"www.qq.com"
+	];
+	var pingIndex = 0;
+	var isConnected = false;
+
+	// 显示正在检测的状态
+	$("network_status").innerHTML = '<span style="color: gray">正在检测...</span>';
+
+	function tryPing() {
+		if (pingIndex >= sites.length) {
+			// 所有网站都检测完毕仍无响应，判定未联网
+			$("network_status").innerHTML = '<span style="color: red">路由器未联网</span>';
+			return;
+		}
+
+		// 使用路由器可能的 ping 接口检测
 		$j.ajax({
-			url: '/ping.asp?target=www.baidu.com',  // 使用路由器自带的 ping 功能（如果支持）
+			url: '/ping.asp?target=' + sites[pingIndex],
 			type: 'GET',
-			timeout: 3000,
-			success: function(response){
-				if(response.indexOf("alive") != -1 || response.indexOf("success") != -1) {
+			timeout: 3000, // 3秒超时
+			success: function(response) {
+				// 检查响应中是否包含成功标志（根据实际路由器固件调整）
+				if (response && (response.indexOf("alive") !== -1 || response.indexOf("success") !== -1)) {
+					isConnected = true;
 					$("network_status").innerHTML = '<span style="color: green">路由器已联网</span>';
 				} else {
-					$("network_status").innerHTML = '<span style="color: red">路由器未联网</span>';
+					pingIndex++;
+					tryPing(); // 尝试下一个网站
 				}
 			},
-			error: function(){
-				// 如果 ping.asp 不存在，则使用 WAN IP 和网关作为最后判断
-				if(wanlink_ip4_wan() != '' && wanlink_gw4_wan() != '') {
-					$("network_status").innerHTML = '<span style="color: green">路由器已联网</span>';
-				} else {
-					$("network_status").innerHTML = '<span style="color: red">路由器未联网</span>';
-				}
+			error: function() {
+				pingIndex++;
+				tryPing(); // 超时或失败，尝试下一个网站
 			}
 		});
 	}
+
+	// 开始检测
+	tryPing();
 }
 
 </script>
