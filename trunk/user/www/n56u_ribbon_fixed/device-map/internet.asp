@@ -271,17 +271,33 @@ function submitInternet(v){
 }
 
 function checkNetwork(){
-	$j.ajax({
-		url: 'http://www.baidu.com',
-		type: 'HEAD',
-		timeout: 3000,
-		success: function(){
-			$("network_status").innerHTML = '<span style="color: green">路由器已联网</span>';
-		},
-		error: function(){
-			$("network_status").innerHTML = '<span style="color: red">路由器未联网</span>';
-		}
-	});
+	// 首先检查 WAN 连接状态
+	var wanStatus = wanlink_status();
+	if(wanStatus == 0 && wanlink_ip4_wan() != '') {  // status 0 表示已连接，且有 WAN IP
+		$("network_status").innerHTML = '<span style="color: green">路由器已联网</span>';
+	} else {
+		// 如果 WAN 状态不可靠，再尝试访问外部网络
+		$j.ajax({
+			url: '/ping.asp?target=www.baidu.com',  // 使用路由器自带的 ping 功能（如果支持）
+			type: 'GET',
+			timeout: 3000,
+			success: function(response){
+				if(response.indexOf("alive") != -1 || response.indexOf("success") != -1) {
+					$("network_status").innerHTML = '<span style="color: green">路由器已联网</span>';
+				} else {
+					$("network_status").innerHTML = '<span style="color: red">路由器未联网</span>';
+				}
+			},
+			error: function(){
+				// 如果 ping.asp 不存在，则使用 WAN IP 和网关作为最后判断
+				if(wanlink_ip4_wan() != '' && wanlink_gw4_wan() != '') {
+					$("network_status").innerHTML = '<span style="color: green">路由器已联网</span>';
+				} else {
+					$("network_status").innerHTML = '<span style="color: red">路由器未联网</span>';
+				}
+			}
+		});
+	}
 }
 
 </script>
