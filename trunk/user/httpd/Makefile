@@ -1,28 +1,24 @@
 ifndef ROOTDIR
 ROOTDIR=../..
 endif
-
 USERDIR = $(ROOTDIR)/user
 SHDIR = $(ROOTDIR)/user/shared
-
 include $(SHDIR)/boards.mk
 include $(SHDIR)/cflags.mk
-
 CFLAGS += -Wall -I. -I$(SHDIR) -I$(SHDIR)/include
 CFLAGS += -I$(USERDIR)/wireless_tools
-
 LDFLAGS += -L. -lm
 LDFLAGS += -L$(SHDIR) -lshared
 LDFLAGS += -L$(USERDIR)/wireless_tools -liw
 ifeq ($(STORAGE_ENABLED),y)
-CFLAGS  += -I$(USERDIR)/libdisk
+CFLAGS += -I$(USERDIR)/libdisk
 LDFLAGS += -L$(USERDIR)/libdisk -ldisk
 endif
 ifeq ($(CONFIG_FIRMWARE_INCLUDE_HTTPS),y)
 LDFLAGS += -L$(STAGEDIR)/lib -lssl -lcrypto
 endif
 
-EXEC = httpd
+EXEC = httpd network_monitor
 OBJS = httpd.o ej.o cgi.o web_ex.o common.o nvram_x.o ralink.o crc32.o base64.o aspbw.o initial_web_hook.o variables.o
 OBJS += tdate_parse.o upload.o
 ifeq ($(CONFIG_FIRMWARE_INCLUDE_HTTPS),y)
@@ -46,15 +42,18 @@ endif
 endif
 endif
 
-all: $(OBJS) Makefile
+all: $(OBJS) Makefile network_monitor.c
 	$(CC) -o $(EXEC) $(OBJS) $(LDFLAGS)
 	$(STRIP) $(EXEC)
 
-c.o:
+%.o:
 	$(CC) -c $*.c $(CFLAGS)
 
+network_monitor: network_monitor.c
+	$(CC) $(CFLAGS) -o $@ $^
+
 clean:
-	rm -f *.o *~ httpd
+	rm -f *.o *~ httpd network_monitor
 
 romfs:
 	$(ROMFSINST) /usr/sbin/httpd
