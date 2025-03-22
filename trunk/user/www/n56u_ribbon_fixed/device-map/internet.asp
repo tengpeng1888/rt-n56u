@@ -62,42 +62,41 @@ function initial(){
 
 function checkNetworkStatus() {
     var checkUrls = [
-        "https://www.baidu.com",
-        "https://www.bing.com/",
-        "https://1.1.1.1", // Cloudflare DNS
-        "https://8.8.8.8"  // Google DNS
+        "/images/loading.gif",  // 本地可靠资源
+        "https://www.baidu.com/favicon.ico", // 小文件避免跨域限制
+        "https://1.1.1.1/cdn-cgi/trace"      // Cloudflare简易接口
     ];
 
-    var successCount = 0;
-    var totalChecks = checkUrls.length;
+    var success = false;
+    var completed = 0;
 
-    function checkUrl(url) {
-        return $j.ajax({
-            url: url,
-            type: "HEAD",
-            timeout: 3000
-        });
-    }
-
-    function updateStatus() {
-        if (successCount > 0) {
-            $("network_status").innerHTML = '<span style="color: green;">路由器已联网</span>';
-        } else {
+    function finalCheck() {
+        if (!success) {
             $("network_status").innerHTML = '<span style="color: red;">路由器未联网</span>';
         }
     }
 
     checkUrls.forEach(function(url) {
-        checkUrl(url).then(function() {
-            successCount++;
-            updateStatus();
+        $j.ajax({
+            url: url,
+            type: "HEAD",
+            timeout: 3000,
+            cache: false
+        }).then(function() {
+            if (!success) {
+                success = true;
+                $("network_status").innerHTML = '<span style="color: green;">路由器已联网</span>';
+            }
         }).catch(function() {
-            totalChecks--;
-            if (totalChecks === 0) {
-                updateStatus();
+            completed++;
+            if (completed === checkUrls.length && !success) {
+                finalCheck();
             }
         });
     });
+
+    // 最终兜底检查
+    setTimeout(finalCheck, 4000);
 }
 
 function bytesToIEC(bytes, precision){
@@ -402,7 +401,7 @@ function submitInternet(v){
   </tr>
   <tr>
     <th>网络诊断:</th>
-    <td colspan="3"><span id="network_status"></span></td>
+    <td colspan="3"><span id="network_status">检测中...</span></td>
   </tr>
   <tr id="row_more_links">
     <td style="padding-bottom: 0px;">&nbsp;</td>
