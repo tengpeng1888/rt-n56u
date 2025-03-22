@@ -61,16 +61,42 @@ function initial(){
 }
 
 function checkNetworkStatus() {
-    $j.ajax({
-        url: "https://www.baidu.com",
-        type: "HEAD",
-        timeout: 3000,
-        success: function() {
+    var checkUrls = [
+        "https://www.baidu.com",
+        "https://www.bing.com/",
+        "https://1.1.1.1", // Cloudflare DNS
+        "https://8.8.8.8"  // Google DNS
+    ];
+
+    var successCount = 0;
+    var totalChecks = checkUrls.length;
+
+    function checkUrl(url) {
+        return $j.ajax({
+            url: url,
+            type: "HEAD",
+            timeout: 3000
+        });
+    }
+
+    function updateStatus() {
+        if (successCount > 0) {
             $("network_status").innerHTML = '<span style="color: green;">路由器已联网</span>';
-        },
-        error: function() {
+        } else {
             $("network_status").innerHTML = '<span style="color: red;">路由器未联网</span>';
         }
+    }
+
+    checkUrls.forEach(function(url) {
+        checkUrl(url).then(function() {
+            successCount++;
+            updateStatus();
+        }).catch(function() {
+            totalChecks--;
+            if (totalChecks === 0) {
+                updateStatus();
+            }
+        });
     });
 }
 
