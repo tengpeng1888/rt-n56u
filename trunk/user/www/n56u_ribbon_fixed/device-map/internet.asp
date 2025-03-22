@@ -83,7 +83,7 @@ function checkNetworkStatus() {
             return;
         }
 
-        // 4. 严格外部网络检测
+        // 4. 严格外部网络检测（使用中国可访问的检测目标）
         checkExternalInternet();
     });
 }
@@ -104,10 +104,11 @@ function pingGateway(gatewayIP, callback) {
 }
 
 function checkExternalInternet() {
+    // 使用中国可访问的检测目标
     var checkUrls = [
-        "https://www.cloudflare.com/cdn-cgi/trace", // 禁止缓存的API
-        "https://test.ustc.edu.cn",      // 轻量检测接口
-        "https://test.nju.edu.cn"
+        "https://www.baidu.com/favicon.ico", // 百度图标
+        "https://www.qq.com/favicon.ico",    // 腾讯图标
+        "https://www.163.com/favicon.ico"    // 网易图标
     ];
 
     var successCount = 0;
