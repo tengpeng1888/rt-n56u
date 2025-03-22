@@ -18,8 +18,43 @@
 <script>
 var $j = jQuery.noConflict();
 
+// 新增日志关键词翻译函数
+function translateLog(logText) {
+    var translations = {
+        "kernel:": "内核:",
+        "entered forwarding state": "进入转发状态",
+        "AP-Client probe:": "无线探针:",
+        "probe response:": "探针响应:",
+        "LINK UP": "连接建立",
+        "WAN up": "外网连接成功",
+        "Server listening": "服务监听中",
+        "ignoring nameserver": "忽略DNS服务器",
+        "using nameserver": "使用DNS服务器",
+        "Synchronizing time": "正在同步时间",
+        "System time changed": "系统时间已变更",
+        "DHCP WAN Client:": "DHCP客户端:",
+        "starting on": "正在启动",
+        "bound": "已绑定",
+        "Load Ralink": "加载",
+        "Timer Module": "定时器模块",
+        "Storage save:": "存储操作:",
+        "Invalid storage": "无效存储",
+        "read /etc/hosts": "读取主机文件",
+        "read /etc/storage": "读取存储配置"
+    };
+    
+    Object.keys(translations).forEach(function(key) {
+        var regex = new RegExp(key, "g");
+        logText = logText.replace(regex, translations[key]);
+    });
+    return logText;
+}
+
 $j(document).ready(function(){
+    // 日志加载后自动翻译
     var textArea = E('textarea');
+    var originalLog = textArea.value;
+    textArea.value = translateLog(originalLog);
     textArea.scrollTop = textArea.scrollHeight;
 });
 
@@ -27,21 +62,23 @@ function initial(){
     show_banner(2);
     show_menu(5,10,1);
     show_footer();
-
     showclock();
 }
 
+// 修改时间显示格式
 function showclock(){
     JS_timeObj.setTime(systime_millsec);
     systime_millsec += 1000;
-    JS_timeObj2 = JS_timeObj.toString();
-    JS_timeObj2 = JS_timeObj2.substring(0,3) + ", " +
-                  JS_timeObj2.substring(4,10) + "  " +
-                  checkTime(JS_timeObj.getHours()) + ":" +
-                  checkTime(JS_timeObj.getMinutes()) + ":" +
-                  checkTime(JS_timeObj.getSeconds()) + "  " +
-                  JS_timeObj.getFullYear() + " 北京时间" +
-                  timezone;
+    JS_timeObj2 = JS_timeObj.toLocaleString('zh-CN', { 
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short'
+    }) + " 北京时间" + timezone;
     $("system_time").innerHTML = JS_timeObj2;
     setTimeout("showclock()", 1000);
 }
@@ -53,6 +90,13 @@ function clearLog(){
 }
 </script>
 <style>
+/* 优化中文显示 */
+textarea {
+    font-family: 'Microsoft YaHei', '宋体', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.5;
+}
+.alert-info { font-weight: bold; }
 .nav-tabs > li > a {
     padding-right: 6px;
     padding-left: 6px;
@@ -117,7 +161,7 @@ function clearLog(){
                                         </tr>
                                         <tr>
                                             <td colspan="3" style="border-top: 0 none; padding-bottom: 0px;">
-                                                <textarea rows="21" class="span12" style="height:377px; font-family:'Courier New', Courier, mono; font-size:13px;" readonly="readonly" wrap="off" id="textarea"><% nvram_dump("syslog.log",""); %></textarea>
+                                                <textarea rows="21" class="span12" style="height:377px;" readonly="readonly" wrap="off" id="textarea"><% nvram_dump("syslog.log",""); %></textarea>
                                             </td>
                                         </tr>
                                         <tr>
