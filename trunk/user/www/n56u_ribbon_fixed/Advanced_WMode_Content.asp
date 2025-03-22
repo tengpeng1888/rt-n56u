@@ -78,20 +78,6 @@ function validForm(){
 			if(!validate_psk(document.form.wl_sta_wpa_psk))
 				return false;
 		}
-		if(document.form.wl_sta_auth_mode.value == "wpa2_eap"){
-			if(!validate_string(document.form.wl_sta_eap_identity))
-				return false;
-			if(!validate_string(document.form.wl_sta_eap_password))
-				return false;
-			if(document.form.wl_sta_eap_method.value == "TLS" || document.form.wl_sta_eap_method.value == "TTLS"){
-				if(!validate_file(document.form.wl_sta_ca_cert))
-					return false;
-				if(!validate_file(document.form.wl_sta_client_cert))
-					return false;
-				if(!validate_file(document.form.wl_sta_private_key))
-					return false;
-			}
-		}
 	}
 	return true;
 }
@@ -156,12 +142,6 @@ function change_wireless_bridge(){
 	showhide_div("row_apc_1", is_apc);
 	showhide_div("row_apc_2", is_apc);
 	showhide_div("row_apc_3", is_apc);
-	showhide_div("row_apc_4", is_apc);
-	showhide_div("row_apc_5", is_apc);
-	showhide_div("row_apc_6", is_apc);
-	showhide_div("row_apc_7", is_apc);
-	showhide_div("row_apc_8", is_apc);
-	showhide_div("row_apc_9", is_apc);
 }
 
 function change_wdsapply(){
@@ -179,12 +159,6 @@ function change_sta_auth_mode(mflag){
 	if(mode == "psk"){
 		inputCtrl(document.form.wl_sta_crypto, 1);
 		inputCtrl(document.form.wl_sta_wpa_psk, 1);
-		inputCtrl(document.form.wl_sta_eap_identity, 0);
-		inputCtrl(document.form.wl_sta_eap_password, 0);
-		inputCtrl(document.form.wl_sta_eap_method, 0);
-		inputCtrl(document.form.wl_sta_ca_cert, 0);
-		inputCtrl(document.form.wl_sta_client_cert, 0);
-		inputCtrl(document.form.wl_sta_private_key, 0);
 		if(opts[opts.selectedIndex].text == "WPA2-Personal"){
 			if (mflag == 1){
 				document.form.wl_sta_crypto.options[0].selected = 0;
@@ -198,24 +172,9 @@ function change_sta_auth_mode(mflag){
 				document.form.wl_sta_wpa_mode.value = "1";
 			}
 		}
-	}else if(mode == "wpa2_eap"){
-		inputCtrl(document.form.wl_sta_crypto, 0);
-		inputCtrl(document.form.wl_sta_wpa_psk, 0);
-		inputCtrl(document.form.wl_sta_eap_identity, 1);
-		inputCtrl(document.form.wl_sta_eap_password, 1);
-		inputCtrl(document.form.wl_sta_eap_method, 1);
-		inputCtrl(document.form.wl_sta_ca_cert, 1);
-		inputCtrl(document.form.wl_sta_client_cert, 1);
-		inputCtrl(document.form.wl_sta_private_key, 1);
 	}else{
 		inputCtrl(document.form.wl_sta_crypto, 0);
 		inputCtrl(document.form.wl_sta_wpa_psk, 0);
-		inputCtrl(document.form.wl_sta_eap_identity, 0);
-		inputCtrl(document.form.wl_sta_eap_password, 0);
-		inputCtrl(document.form.wl_sta_eap_method, 0);
-		inputCtrl(document.form.wl_sta_ca_cert, 0);
-		inputCtrl(document.form.wl_sta_client_cert, 0);
-		inputCtrl(document.form.wl_sta_private_key, 0);
 	}
 }
 
@@ -373,10 +332,10 @@ function hideClients_Block(){
                                             <td style="border-top: 0 none;">
                                                 <select name="wl_mode_x" class="input" onChange="change_wireless_bridge();">
                                                     <option value="0" <% nvram_match_x("","wl_mode_x", "0","selected"); %>><#WdsMode0#></option>
-                                                    <option value="1" <% nvram_match_x("","wl_mode_x", "1","selected"); %>><#WdsMode1#></option>
-                                                    <option value="2" <% nvram_match_x("","wl_mode_x", "2","selected"); %>><#WdsMode2#></option>
-                                                    <option value="3" <% nvram_match_x("","wl_mode_x", "3","selected"); %>><#WdsMode3#></option>
-                                                    <option value="4" <% nvram_match_x("","wl_mode_x", "4","selected"); %>><#WdsMode4#></option>
+                                                    <option value="1" <% nvram_match_x("","wl_mode_x", "1","selected"); %>><#WdsMode1#></option>
+                                                    <option value="2" <% nvram_match_x("","wl_mode_x", "2","selected"); %>><#WdsMode2#></option>
+                                                    <option value="3" <% nvram_match_x("","wl_mode_x", "3","selected"); %>><#WdsMode3#></option>
+                                                    <option value="4" <% nvram_match_x("","wl_mode_x", "4","selected"); %>><#WdsMode4#></option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -402,7 +361,7 @@ function hideClients_Block(){
                                             <td>
                                                 <select name="wl_wdsapply_x" class="input" onChange="change_wdsapply();">
                                                     <option value="0" <% nvram_match_x("","wl_wdsapply_x", "0","selected"); %>><#WdsLazy#></option>
-                                                    <option value="1" <% nvram_match_x("","wl_wdsapply_x", "1","selected"); %>><#checkbox_Yes#></option>
+                                                    <option value="1" <% nvram_match_x("","wl_wdsapply_x", "1","selected"); %>><#checkbox_Yes#></option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -441,7 +400,6 @@ function hideClients_Block(){
                                                     <option value="open" <% nvram_match_x("", "wl_sta_auth_mode", "open", "selected"); %>>Open System</option>
                                                     <option value="psk" <% nvram_double_match_x("", "wl_sta_auth_mode", "psk", "", "wl_sta_wpa_mode", "1", "selected"); %>>WPA-Personal</option>
                                                     <option value="psk" <% nvram_double_match_x("", "wl_sta_auth_mode", "psk", "", "wl_sta_wpa_mode", "2", "selected"); %>>WPA2-Personal</option>
-                                                    <option value="wpa2_eap" <% nvram_match_x("", "wl_sta_auth_mode", "wpa2_eap", "selected"); %>>WPA2-Enterprise (EAP)</option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -461,50 +419,6 @@ function hideClients_Block(){
                                                     <input type="password" name="wl_sta_wpa_psk" id="wl_sta_wpa_psk" maxlength="64" size="32" value="" style="width: 175px;">
                                                     <button style="margin-left: -5px;" class="btn" type="button" onclick="passwordShowHide('wl_sta_wpa_psk')"><i class="icon-eye-close"></i></button>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr id="row_apc_4" style="display:none;">
-                                            <th><a class="help_tooltip" href="javascript:void(0);" onmouseover="openTooltip(this, 0, 8);">EAP Identity</a></th>
-                                            <td>
-                                                <input type="text" name="wl_sta_eap_identity" id="wl_sta_eap_identity" maxlength="64" size="32" value="" style="width: 175px;">
-                                            </td>
-                                        </tr>
-                                        <tr id="row_apc_5" style="display:none;">
-                                            <th><a class="help_tooltip" href="javascript:void(0);" onmouseover="openTooltip(this, 0, 9);">EAP Password</a></th>
-                                            <td>
-                                                <div class="input-append">
-                                                    <input type="password" name="wl_sta_eap_password" id="wl_sta_eap_password" maxlength="64" size="32" value="" style="width: 175px;">
-                                                    <button style="margin-left: -5px;" class="btn" type="button" onclick="passwordShowHide('wl_sta_eap_password')"><i class="icon-eye-close"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr id="row_apc_6" style="display:none;">
-                                            <th><a class="help_tooltip" href="javascript:void(0);" onmouseover="openTooltip(this, 0, 10);">EAP Method</a></th>
-                                            <td>
-                                                <select name="wl_sta_eap_method" class="input">
-                                                    <option value="PEAP">PEAP</option>
-                                                    <option value="TLS">TLS</option>
-                                                    <option value="TTLS">TTLS</option>
-                                                    <option value="FAST">FAST</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <tr id="row_apc_7" style="display:none;">
-                                            <th><a class="help_tooltip" href="javascript:void(0);" onmouseover="openTooltip(this, 0, 11);">CA Certificate</a></th>
-                                            <td>
-                                                <input type="file" name="wl_sta_ca_cert" id="wl_sta_ca_cert" accept=".pem,.crt" style="width: 175px;">
-                                            </td>
-                                        </tr>
-                                        <tr id="row_apc_8" style="display:none;">
-                                            <th><a class="help_tooltip" href="javascript:void(0);" onmouseover="openTooltip(this, 0, 12);">Client Certificate</a></th>
-                                            <td>
-                                                <input type="file" name="wl_sta_client_cert" id="wl_sta_client_cert" accept=".pem,.crt" style="width: 175px;">
-                                            </td>
-                                        </tr>
-                                        <tr id="row_apc_9" style="display:none;">
-                                            <th><a class="help_tooltip" href="javascript:void(0);" onmouseover="openTooltip(this, 0, 13);">Private Key</a></th>
-                                            <td>
-                                                <input type="file" name="wl_sta_private_key" id="wl_sta_private_key" accept=".pem,.key" style="width: 175px;">
                                             </td>
                                         </tr>
                                     </table>
