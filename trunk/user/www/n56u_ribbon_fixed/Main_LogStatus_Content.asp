@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#Web_Title#> - <#menu5_7_2#></title>
+<title><#Web_Title#> - 系统日志</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
@@ -19,37 +19,37 @@
 var $j = jQuery.noConflict();
 
 $j(document).ready(function(){
-	var textArea = E('textarea');
-	textArea.scrollTop = textArea.scrollHeight;
+    var textArea = E('textarea');
+    textArea.scrollTop = textArea.scrollHeight;
 });
 
 function initial(){
-	show_banner(2);
-	show_menu(5,10,1);
-	show_footer();
+    show_banner(2);
+    show_menu(5,10,1);
+    show_footer();
 
-	showclock();
+    showclock();
 }
 
 function showclock(){
-	JS_timeObj.setTime(systime_millsec);
-	systime_millsec += 1000;
-	JS_timeObj2 = JS_timeObj.toString();
-	JS_timeObj2 = JS_timeObj2.substring(0,3) + ", " +
-	              JS_timeObj2.substring(4,10) + "  " +
-				  checkTime(JS_timeObj.getHours()) + ":" +
-				  checkTime(JS_timeObj.getMinutes()) + ":" +
-				  checkTime(JS_timeObj.getSeconds()) + "  " +
-				  JS_timeObj.getFullYear() + " GMT" +
-				  timezone;
-	$("system_time").innerHTML = JS_timeObj2;
-	setTimeout("showclock()", 1000);
+    JS_timeObj.setTime(systime_millsec);
+    systime_millsec += 1000;
+    JS_timeObj2 = JS_timeObj.toString();
+    JS_timeObj2 = JS_timeObj2.substring(0,3) + ", " +
+                  JS_timeObj2.substring(4,10) + "  " +
+                  checkTime(JS_timeObj.getHours()) + ":" +
+                  checkTime(JS_timeObj.getMinutes()) + ":" +
+                  checkTime(JS_timeObj.getSeconds()) + "  " +
+                  JS_timeObj.getFullYear() + " 北京时间" +
+                  timezone;
+    $("system_time").innerHTML = JS_timeObj2;
+    setTimeout("showclock()", 1000);
 }
 
 function clearLog(){
-	document.form.next_host.value = location.host;
-	document.form.action_mode.value = " ClearLog ";
-	document.form.submit();
+    document.form.next_host.value = location.host;
+    document.form.action_mode.value = " ClearLog ";
+    document.form.submit();
 }
 </script>
 <style>
@@ -104,7 +104,7 @@ function clearLog(){
                 <div class="row-fluid">
                     <div class="span12">
                         <div class="box well grad_colour_dark_blue">
-                            <h2 class="box_head round_top"><#menu5_7#> - <#menu5_7_2#></h2>
+                            <h2 class="box_head round_top">系统状态 - 系统日志</h2>
                             <div class="round_bottom">
                                 <div class="row-fluid">
                                     <div id="tabMenu" class="submenuBlock"></div>
@@ -112,7 +112,7 @@ function clearLog(){
                                     <table width="100%" cellpadding="4" cellspacing="0" class="table">
                                         <tr>
                                             <td colspan="3" style="border-top: 0 none; padding-bottom: 0px;">
-                                                <b><#General_x_SystemTime_itemname#>:</b><span class="alert alert-info" style="margin-left: 10px; padding-top: 4px; padding-bottom: 4px;" id="system_time"></span>
+                                                <b>系统时间:</b><span class="alert alert-info" style="margin-left: 10px; padding-top: 4px; padding-bottom: 4px;" id="system_time"></span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -122,13 +122,13 @@ function clearLog(){
                                         </tr>
                                         <tr>
                                             <td width="15%" style="text-align: left; padding-bottom: 0px;">
-                                                <input type="submit" onClick="clearLog();" value="<#CTL_clear#>" class="btn btn-info" style="width: 170px">
+                                                <input type="submit" onClick="clearLog();" value="清除日志" class="btn btn-info" style="width: 170px">
                                             </td>
                                             <td width="15%" style="text-align: left; padding-bottom: 0px;">
-                                                <input type="button" onClick="location.href='syslog.txt'" value="<#CTL_onlysave#>" class="btn btn-success" style="width: 170px">
+                                                <input type="button" onClick="location.href='syslog.txt'" value="保存日志" class="btn btn-success" style="width: 170px">
                                             </td>
                                             <td style="text-align: right; padding-bottom: 0px;">
-                                                <input type="button" onClick="location.href=location.href" value="<#CTL_refresh#>" class="btn btn-primary" style="width: 219px">
+                                                <input type="button" onClick="location.href=location.href" value="刷新页面" class="btn btn-primary" style="width: 219px">
                                             </td>
                                         </tr>
                                     </table>
