@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><#Web_Title#> - 系统日志</title>
+<title><#Web_Title#> - <#menu5_7_2#></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
@@ -18,85 +18,41 @@
 <script>
 var $j = jQuery.noConflict();
 
-// 新增日志关键词翻译函数
-function translateLog(logText) {
-    var translations = {
-        "kernel:": "内核:",
-        "entered forwarding state": "进入转发状态",
-        "AP-Client probe:": "无线探针:",
-        "probe response:": "探针响应:",
-        "LINK UP": "连接建立",
-        "WAN up": "外网连接成功",
-        "Server listening": "服务监听中",
-        "ignoring nameserver": "忽略DNS服务器",
-        "using nameserver": "使用DNS服务器",
-        "Synchronizing time": "正在同步时间",
-        "System time changed": "系统时间已变更",
-        "DHCP WAN Client:": "DHCP客户端:",
-        "starting on": "正在启动",
-        "bound": "已绑定",
-        "Load Ralink": "加载",
-        "Timer Module": "定时器模块",
-        "Storage save:": "存储操作:",
-        "Invalid storage": "无效存储",
-        "read /etc/hosts": "读取主机文件",
-        "read /etc/storage": "读取存储配置"
-    };
-    
-    Object.keys(translations).forEach(function(key) {
-        var regex = new RegExp(key, "g");
-        logText = logText.replace(regex, translations[key]);
-    });
-    return logText;
-}
-
 $j(document).ready(function(){
-    // 日志加载后自动翻译
-    var textArea = E('textarea');
-    var originalLog = textArea.value;
-    textArea.value = translateLog(originalLog);
-    textArea.scrollTop = textArea.scrollHeight;
+	var textArea = E('textarea');
+	textArea.scrollTop = textArea.scrollHeight;
 });
 
 function initial(){
-    show_banner(2);
-    show_menu(5,10,1);
-    show_footer();
-    showclock();
+	show_banner(2);
+	show_menu(5,10,1);
+	show_footer();
+
+	showclock();
 }
 
-// 修改时间显示格式
 function showclock(){
-    JS_timeObj.setTime(systime_millsec);
-    systime_millsec += 1000;
-    JS_timeObj2 = JS_timeObj.toLocaleString('zh-CN', { 
-        weekday: 'short',
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        timeZoneName: 'short'
-    }) + " 北京时间" + timezone;
-    $("system_time").innerHTML = JS_timeObj2;
-    setTimeout("showclock()", 1000);
+	JS_timeObj.setTime(systime_millsec);
+	systime_millsec += 1000;
+	JS_timeObj2 = JS_timeObj.toString();
+	JS_timeObj2 = JS_timeObj2.substring(0,3) + ", " +
+	              JS_timeObj2.substring(4,10) + "  " +
+				  checkTime(JS_timeObj.getHours()) + ":" +
+				  checkTime(JS_timeObj.getMinutes()) + ":" +
+				  checkTime(JS_timeObj.getSeconds()) + "  " +
+				  JS_timeObj.getFullYear() + " GMT" +
+				  timezone;
+	$("system_time").innerHTML = JS_timeObj2;
+	setTimeout("showclock()", 1000);
 }
 
 function clearLog(){
-    document.form.next_host.value = location.host;
-    document.form.action_mode.value = " ClearLog ";
-    document.form.submit();
+	document.form.next_host.value = location.host;
+	document.form.action_mode.value = " ClearLog ";
+	document.form.submit();
 }
 </script>
 <style>
-/* 优化中文显示 */
-textarea {
-    font-family: 'Microsoft YaHei', '宋体', monospace !important;
-    font-size: 14px !important;
-    line-height: 1.5;
-}
-.alert-info { font-weight: bold; }
 .nav-tabs > li > a {
     padding-right: 6px;
     padding-left: 6px;
@@ -148,7 +104,7 @@ textarea {
                 <div class="row-fluid">
                     <div class="span12">
                         <div class="box well grad_colour_dark_blue">
-                            <h2 class="box_head round_top">系统状态 - 系统日志</h2>
+                            <h2 class="box_head round_top"><#menu5_7#> - <#menu5_7_2#></h2>
                             <div class="round_bottom">
                                 <div class="row-fluid">
                                     <div id="tabMenu" class="submenuBlock"></div>
@@ -156,23 +112,23 @@ textarea {
                                     <table width="100%" cellpadding="4" cellspacing="0" class="table">
                                         <tr>
                                             <td colspan="3" style="border-top: 0 none; padding-bottom: 0px;">
-                                                <b>系统时间:</b><span class="alert alert-info" style="margin-left: 10px; padding-top: 4px; padding-bottom: 4px;" id="system_time"></span>
+                                                <b><#General_x_SystemTime_itemname#>:</b><span class="alert alert-info" style="margin-left: 10px; padding-top: 4px; padding-bottom: 4px;" id="system_time"></span>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="3" style="border-top: 0 none; padding-bottom: 0px;">
-                                                <textarea rows="21" class="span12" style="height:377px;" readonly="readonly" wrap="off" id="textarea"><% nvram_dump("syslog.log",""); %></textarea>
+                                                <textarea rows="21" class="span12" style="height:377px; font-family:'Courier New', Courier, mono; font-size:13px;" readonly="readonly" wrap="off" id="textarea"><% nvram_dump("syslog.log",""); %></textarea>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td width="15%" style="text-align: left; padding-bottom: 0px;">
-                                                <input type="submit" onClick="clearLog();" value="清除日志" class="btn btn-info" style="width: 170px">
+                                                <input type="submit" onClick="clearLog();" value="<#CTL_clear#>" class="btn btn-info" style="width: 170px">
                                             </td>
                                             <td width="15%" style="text-align: left; padding-bottom: 0px;">
-                                                <input type="button" onClick="location.href='syslog.txt'" value="保存日志" class="btn btn-success" style="width: 170px">
+                                                <input type="button" onClick="location.href='syslog.txt'" value="<#CTL_onlysave#>" class="btn btn-success" style="width: 170px">
                                             </td>
                                             <td style="text-align: right; padding-bottom: 0px;">
-                                                <input type="button" onClick="location.href=location.href" value="刷新页面" class="btn btn-primary" style="width: 219px">
+                                                <input type="button" onClick="location.href=location.href" value="<#CTL_refresh#>" class="btn btn-primary" style="width: 219px">
                                             </td>
                                         </tr>
                                     </table>
