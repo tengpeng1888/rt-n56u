@@ -566,16 +566,16 @@ function validate_wlphrase(s, v, obj){
                                             <th><#WIFIRegionCode#></th>
                                             <td>
                                                 <select name="wl_country_code" class="input" onChange="return change_common_wl(this, 'WLANConfig11a', 'wl_country_code')">
-                                                    <option value="US" <% nvram_match_x("", "wl_country_code", "US","selected"); %>>USA (channels 36,40,44,48,52,56,60,64,149,153,157,161,165)</option>
-                                                    <option value="AU" <% nvram_match_x("", "wl_country_code", "AU","selected"); %>>Australia (channels 36,40,44,48,52,56,60,64,149,153,157,161,165)</option>
-                                                    <option value="NO" <% nvram_match_x("", "wl_country_code", "NO","selected"); %>>Norway (channels 36,40,44,48,149,153,157,161,165)</option>
-                                                    <option value="FR" <% nvram_match_x("", "wl_country_code", "FR","selected"); %>>France (channels 36,40,44,48)</option>
-                                                    <option value="GB" <% nvram_match_x("", "wl_country_code", "GB","selected"); %>>Europe (channels 36,40,44,48)</option>
-                                                    <option value="TW" <% nvram_match_x("", "wl_country_code", "TW","selected"); %>>Taiwan (channels 149,153,157,161)</option>
-                                                    <option value="CN" <% nvram_match_x("", "wl_country_code", "CN","selected"); %>>China (channels 36,40,44,48,149,153,157,161,165)</option>
-                                                    <option value="KR" <% nvram_match_x("", "wl_country_code", "KR","selected"); %>>Korea (channels 149,153,157,161)</option>
-                                                    <option value="JP" <% nvram_match_x("", "wl_country_code", "JP","selected"); %>>Japan (channels 36,40,44,48)</option>
-                                                    <option value="DB" <% nvram_match_x("", "wl_country_code", "DB","selected"); %>>Debug (all channels)</option>
+                                                    <option value="US">USA (channels 36,40,44,48,52,56,60,64,149,153,157,161,165)</option>
+                                                    <option value="AU">Australia (channels 36,40,44,48,52,56,60,64,149,153,157,161,165)</option>
+                                                    <option value="NO">Norway (channels 36,40,44,48,149,153,157,161,165)</option>
+                                                    <option value="FR">France (channels 36,40,44,48)</option>
+                                                    <option value="GB">Europe (channels 36,40,44,48)</option>
+                                                    <option value="TW">Taiwan (channels 149,153,157,161)</option>
+                                                    <option value="CN">China (channels 36,40,44,48,149,153,157,161,165)</option>
+                                                    <option value="KR">Korea (channels 149,153,157,161)</option>
+                                                    <option value="JP">Japan (channels 36,40,44,48)</option>
+                                                    <option value="DB" selected>Debug (all channels)</option>  <!-- 强制默认选中 -->
                                                 </select>
                                             </td>
                                         </tr>
