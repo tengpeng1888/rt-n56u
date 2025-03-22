@@ -61,57 +61,83 @@ function initial(){
 }
 
 function checkNetworkStatus() {
-    // 先检查网线是否插入
+    // 1. 检查物理连接
     var etherLink = wanlink_etherlink();
     if (etherLink === '' || etherLink === 'No Link') {
         $("network_status").innerHTML = '<span style="color: red;">未插入网线</span>';
         return;
     }
 
-    // 如果网线已插入，检查 WAN 口是否有 IP 地址
+    // 2. 检查WAN口IP有效性
     var wanIP = wanlink_ip4_wan();
-    if (!wanIP || wanIP === '--') {
-        $("network_status").innerHTML = '<span style="color: red;">WAN 口未获取到 IP</span>';
+    var wanGW = wanlink_gw4_wan();
+    if (!wanIP || wanIP === '--' || !wanGW || wanGW === '--') {
+        $("network_status").innerHTML = '<span style="color: red;">WAN口连接异常</span>';
         return;
     }
 
-    // 如果 WAN 口有 IP，再进行外部网络检测
+    // 3. 检测网关可达性（关键新增逻辑）
+    pingGateway(wanGW, function(success) {
+        if (!success) {
+            $("network_status").innerHTML = '<span style="color: red;">网关不可达</span>';
+            return;
+        }
+
+        // 4. 严格外部网络检测
+        checkExternalInternet();
+    });
+}
+
+function pingGateway(gatewayIP, callback) {
+    var img = new Image();
+    var start = new Date().getTime();
+    img.src = "http://" + gatewayIP + "/images/loading.gif?" + start;
+    img.onload = function() {
+        callback(true);
+    };
+    img.onerror = function() {
+        callback(true); // 部分设备可能屏蔽图片请求，此处降级处理
+    };
+    setTimeout(function() {
+        callback(false);
+    }, 3000);
+}
+
+function checkExternalInternet() {
     var checkUrls = [
-        "/images/loading.gif",  // 本地可靠资源
-        "https://www.baidu.com/favicon.ico", // 小文件避免跨域限制
-        "https://1.1.1.1/cdn-cgi/trace"      // Cloudflare简易接口
+        "https://www.cloudflare.com/cdn-cgi/trace", // 禁止缓存的API
+        "https://test.ustc.edu.cn",      // 轻量检测接口
+        "https://test.nju.edu.cn"
     ];
 
-    var success = false;
-    var completed = 0;
-
-    function finalCheck() {
-        if (!success) {
-            $("network_status").innerHTML = '<span style="color: red;">路由器未联网</span>';
-        }
-    }
+    var successCount = 0;
+    var requiredSuccess = 2; // 需要至少2个检测成功
 
     checkUrls.forEach(function(url) {
         $j.ajax({
             url: url,
-            type: "HEAD",
-            timeout: 3000,
-            cache: false
-        }).then(function() {
-            if (!success) {
-                success = true;
-                $("network_status").innerHTML = '<span style="color: green;">路由器已联网</span>';
+            type: "GET",
+            timeout: 5000,
+            cache: false,
+            headers: { "Cache-Control": "no-cache" }
+        }).then(function(response, status, xhr) {
+            if (xhr.status === 200 || xhr.status === 204) {
+                successCount++;
+                if (successCount >= requiredSuccess) {
+                    $("network_status").innerHTML = '<span style="color: green;">路由器已联网</span>';
+                }
             }
         }).catch(function() {
-            completed++;
-            if (completed === checkUrls.length && !success) {
-                finalCheck();
-            }
+            // 失败不处理，等待最终检查
         });
     });
 
-    // 最终兜底检查
-    setTimeout(finalCheck, 4000);
+    // 最终严格判断
+    setTimeout(function() {
+        if (successCount < requiredSuccess) {
+            $("network_status").innerHTML = '<span style="color: red;">互联网访问异常</span>';
+        }
+    }, 6000);
 }
 
 function bytesToIEC(bytes, precision){
