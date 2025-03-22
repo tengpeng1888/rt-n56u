@@ -76,31 +76,8 @@ function checkNetworkStatus() {
         return;
     }
 
-    // 3. 检测网关可达性（关键新增逻辑）
-    pingGateway(wanGW, function(success) {
-        if (!success) {
-            $("network_status").innerHTML = '<span style="color: red;">网关不可达</span>';
-            return;
-        }
-
-        // 4. 严格外部网络检测（使用中国可访问的检测目标）
-        checkExternalInternet();
-    });
-}
-
-function pingGateway(gatewayIP, callback) {
-    var img = new Image();
-    var start = new Date().getTime();
-    img.src = "http://" + gatewayIP + "/images/loading.gif?" + start;
-    img.onload = function() {
-        callback(true);
-    };
-    img.onerror = function() {
-        callback(true); // 部分设备可能屏蔽图片请求，此处降级处理
-    };
-    setTimeout(function() {
-        callback(false);
-    }, 3000);
+    // 3. 严格外部网络检测（使用中国可访问的检测目标）
+    checkExternalInternet();
 }
 
 function checkExternalInternet() {
