@@ -270,50 +270,34 @@ function submitInternet(v){
 	document.internetForm.submit();
 }
 
-function checkNetwork(){
-	// 定义要 ping 的国内网站列表
-	var sites = [
-		"www.baidu.com",
-		"www.aliyun.com",
-		"www.qq.com"
-	];
-	var pingIndex = 0;
-	var isConnected = false;
-
-	// 显示正在检测的状态
-	$("network_status").innerHTML = '<span style="color: gray">正在检测...</span>';
-
-	function tryPing() {
-		if (pingIndex >= sites.length) {
-			// 所有网站都检测完毕仍无响应，判定未联网
-			$("network_status").innerHTML = '<span style="color: red">路由器未联网</span>';
-			return;
-		}
-
-		// 使用路由器可能的 ping 接口检测
-		$j.ajax({
-			url: '/ping.asp?target=' + sites[pingIndex],
-			type: 'GET',
-			timeout: 3000, // 3秒超时
-			success: function(response) {
-				// 检查响应中是否包含成功标志（根据实际路由器固件调整）
-				if (response && (response.indexOf("alive") !== -1 || response.indexOf("success") !== -1)) {
-					isConnected = true;
-					$("network_status").innerHTML = '<span style="color: green">路由器已联网</span>';
-				} else {
-					pingIndex++;
-					tryPing(); // 尝试下一个网站
-				}
-			},
-			error: function() {
-				pingIndex++;
-				tryPing(); // 超时或失败，尝试下一个网站
-			}
-		});
-	}
-
-	// 开始检测
-	tryPing();
+// 优化后的网络诊断功能
+function checkInternet(){
+	var statusSpan = document.getElementById("netStatus");
+	statusSpan.innerHTML = '<span class="label label-default">检测中...</span>';
+	
+	var img = new Image();
+	var timeoutTimer;
+	
+	// 成功回调
+	img.onload = function() {
+		clearTimeout(timeoutTimer);
+		statusSpan.innerHTML = '<span class="label label-success">路由器已联网</span>';
+	};
+	
+	// 失败回调
+	img.onerror = function() {
+		clearTimeout(timeoutTimer);
+		statusSpan.innerHTML = '<span class="label label-danger">路由器未联网</span>';
+	};
+	
+	// 超时处理（5秒）
+	timeoutTimer = setTimeout(function() {
+		img.onerror = null; // 防止重复触发
+		statusSpan.innerHTML = '<span class="label label-danger">路由器未联网</span>';
+	}, 5000);
+	
+	// 发起请求（使用带时间戳的URL避免缓存）
+	img.src = "https://www.baidu.com/favicon.ico?_=" + new Date().getTime();
 }
 
 </script>
@@ -405,11 +389,12 @@ function checkNetwork(){
     <th><#MAC_Address#></th>
     <td colspan="3"><span id="WANMAC"></span></td>
   </tr>
+  <!-- 优化后的网络诊断行 -->
   <tr>
     <th>网络诊断</th>
     <td colspan="3">
-      <input type="button" class="btn btn-info" value="开始诊断" onclick="checkNetwork();">
-      <span id="network_status"></span>
+      <button type="button" class="btn btn-info" onclick="checkInternet()">立即检测</button>
+      <span id="netStatus" style="margin-left: 15px;"></span>
     </td>
   </tr>
   <tr id="row_more_links">
