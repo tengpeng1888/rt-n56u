@@ -55,8 +55,23 @@ function initial(){
 	}
 
 	fill_info();
+	checkNetworkStatus(); // 添加网络状态检测
 
 	id_update_wanip = setTimeout("update_wanip();", 2500);
+}
+
+function checkNetworkStatus() {
+    $j.ajax({
+        url: "https://www.baidu.com",
+        type: "HEAD",
+        timeout: 3000,
+        success: function() {
+            $("network_status").innerHTML = '<span style="color: green;">路由器已联网</span>';
+        },
+        error: function() {
+            $("network_status").innerHTML = '<span style="color: red;">路由器未联网</span>';
+        }
+    });
 }
 
 function bytesToIEC(bytes, precision){
@@ -270,30 +285,6 @@ function submitInternet(v){
 	document.internetForm.submit();
 }
 
-// 新增网络检测函数
-function checkInternet(){
-	var statusSpan = document.getElementById('net_diag_status');
-	statusSpan.innerHTML = '<span class="label label-info">检测中...</span>';
-	
-	var img = new Image();
-	img.onload = function() {
-		statusSpan.innerHTML = '<span class="label label-success">路由器已联网</span>';
-	};
-	img.onerror = function() {
-		statusSpan.innerHTML = '<span class="label label-danger">路由器未联网</span>';
-	};
-	
-	// 设置超时检测（5秒）
-	setTimeout(function(){
-		if(!img.complete){
-			statusSpan.innerHTML = '<span class="label label-danger">路由器未联网</span>';
-		}
-	}, 5000);
-	
-	// 请求百度favicon防止缓存问题
-	img.src = 'http://www.baidu.com/favicon.ico?_=' + Date.now();
-}
-
 </script>
 </head>
 
@@ -333,63 +324,75 @@ function checkInternet(){
     <th><#Connectiontype#>:</th>
     <td colspan="3"><span id="WANType"></span></td>
   </tr>
-  <tr>
-    <th><#MACAddress#></th>
-    <td colspan="3"><span id="WANMAC"></span></td>
-  </tr>
-  <!-- 新增网络诊断行 -->
-  <tr>
-    <th>网络诊断</th>
-    <td colspan="3">
-      <button type="button" class="btn btn-mini" onclick="checkInternet()">检测网络</button>
-      <span id="net_diag_status"></span>
-    </td>
-  </tr>
-  <tr>
-    <th><#IPConnection_ExternalIPAddress#></th>
-    <td colspan="3"><span id="WANIP4"></span></td>
-  </tr>
-  <tr>
-    <th><#IPConnection_ExternalGateway#></th>
-    <td colspan="3"><span id="WANGW4"></span></td>
-  </tr>
-  <tr>
-    <th><#IPConnection_x_DNSServer#></th>
-    <td colspan="3"><span id="WANDNS"></span></td>
-  </tr>
-  <tr id="row_man_ip4" style="display:none">
-    <th><#IPConnection_ExternalIPAddress_Man#></th>
-    <td colspan="3"><span id="MANIP4"></span></td>
-  </tr>
-  <tr id="row_man_gw4" style="display:none">
-    <th><#IPConnection_ExternalGateway_Man#></th>
-    <td colspan="3"><span id="MANGW4"></span></td>
-  </tr>
-  <tr id="row_wan_ip6" style="display:none">
-    <th>IPv6 <#IPConnection_ExternalIPAddress#></th>
-    <td colspan="3"><span id="WANIP6"></span></td>
-  </tr>
-  <tr id="row_lan_ip6" style="display:none">
-    <th>IPv6 <#IPConnection_InternalIPAddress#></th>
-    <td colspan="3"><span id="LANIP6"></span></td>
-  </tr>
   <tr id="row_uptime" style="display:none">
-    <th><#ConnectionUptime#></th>
+    <th><#WAN_Uptime#></th>
     <td colspan="3"><span id="WANTime"></span></td>
   </tr>
   <tr id="row_dltime" style="display:none">
-    <th><#IPConnection_LeaseTime#></th>
+    <th><#WAN_Lease#></th>
     <td colspan="3"><span id="WANLease"></span></td>
   </tr>
   <tr id="row_bytes" style="display:none">
-    <th><#Traffic#></th>
-    <td width="50%"><span id="WANBytesRX"></span></td>
+    <th><#WAN_Bytes#></th>
+    <td width="90px"><span id="WANBytesRX"></span></td>
     <td colspan="2"><span id="WANBytesTX"></span></td>
   </tr>
   <tr id="row_brate" style="display:none">
-    <th><#TrafficRate#></th>
-    <td><span id="WANBRateRX"></span></td>
+    <th><#WAN_BRate#></th>
+    <td width="90px"><span id="WANBRateRX"></span></td>
     <td colspan="2"><span id="WANBRateTX"></span></td>
+  </tr>
+  <tr>
+    <th><#IP4_Addr#> WAN:</th>
+    <td colspan="3"><span id="WANIP4"></span></td>
+  </tr>
+  <tr id="row_man_ip4" style="display:none">
+    <th><#IP4_Addr#> MAN:</th>
+    <td colspan="3"><span id="MANIP4"></span></td>
+  </tr>
+  <tr id="row_wan_ip6" style="display:none">
+    <th><#IP6_Addr#> WAN:</th>
+    <td colspan="3"><span id="WANIP6"></span></td>
+  </tr>
+  <tr id="row_lan_ip6" style="display:none">
+    <th><#IP6_Addr#> LAN:</th>
+    <td colspan="3"><span id="LANIP6"></span></td>
+  </tr>
+  <tr>
+    <th><#Gateway#> WAN:</th>
+    <td colspan="3"><span id="WANGW4"></span></td>
+  </tr>
+  <tr id="row_man_gw4" style="display:none">
+    <th><#Gateway#> MAN:</th>
+    <td colspan="3"><span id="MANGW4"></span></td>
+  </tr>
+  <tr>
+    <th>DNS:</th>
+    <td colspan="3"><span id="WANDNS"></span></td>
+  </tr>
+  <tr>
+    <th><#MAC_Address#></th>
+    <td colspan="3"><span id="WANMAC"></span></td>
+  </tr>
+  <tr>
+    <th>网络诊断:</th>
+    <td colspan="3"><span id="network_status"></span></td>
+  </tr>
+  <tr id="row_more_links">
+    <td style="padding-bottom: 0px;">&nbsp;</td>
+    <td style="padding-bottom: 0px;" colspan="3">
+        <select id="domore" class="domore" style="width: 260px;" onchange="domore_link(this);">
+          <option selected="selected"><#MoreConfig#>...</option>
+          <option value="../Advanced_WAN_Content.asp"><#menu5_3_1#></option>
+          <option value="../Advanced_IPv6_Content.asp"><#menu5_3_3#></option>
+          <option value="../Advanced_VirtualServer_Content.asp"><#menu5_3_4#></option>
+          <option value="../Advanced_Exposed_Content.asp"><#menu5_3_5#></option>
+          <option value="../Advanced_DDNS_Content.asp"><#menu5_3_6#></option>
+          <option value="../Advanced_Modem_others.asp"><#menu5_4_4#></option>
+          <option value="../vpnsrv.asp"><#menu2#></option>
+          <option value="../vpncli.asp"><#menu6#></option>
+        </select>
+    </td>
   </tr>
 </table>
 
