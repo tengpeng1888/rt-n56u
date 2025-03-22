@@ -55,67 +55,8 @@ function initial(){
 	}
 
 	fill_info();
-	checkNetworkStatus(); // 添加网络状态检测
 
 	id_update_wanip = setTimeout("update_wanip();", 2500);
-}
-
-function checkNetworkStatus() {
-    // 1. 检查物理连接
-    var etherLink = wanlink_etherlink();
-    if (etherLink === '' || etherLink === 'No Link') {
-        $("network_status").innerHTML = '<span style="color: red;">未插入网线</span>';
-        return;
-    }
-
-    // 2. 检查WAN口IP有效性
-    var wanIP = wanlink_ip4_wan();
-    var wanGW = wanlink_gw4_wan();
-    if (!wanIP || wanIP === '--' || !wanGW || wanGW === '--') {
-        $("network_status").innerHTML = '<span style="color: red;">WAN口连接异常</span>';
-        return;
-    }
-
-    // 3. 严格外部网络检测（使用中国可访问的检测目标）
-    checkExternalInternet();
-}
-
-function checkExternalInternet() {
-    // 使用中国可访问的检测目标
-    var checkUrls = [
-        "https://www.baidu.com/favicon.ico", // 百度图标
-        "https://www.qq.com/favicon.ico",    // 腾讯图标
-        "https://www.163.com/favicon.ico"    // 网易图标
-    ];
-
-    var successCount = 0;
-    var requiredSuccess = 2; // 需要至少2个检测成功
-
-    checkUrls.forEach(function(url) {
-        $j.ajax({
-            url: url,
-            type: "GET",
-            timeout: 5000,
-            cache: false,
-            headers: { "Cache-Control": "no-cache" }
-        }).then(function(response, status, xhr) {
-            if (xhr.status === 200 || xhr.status === 204) {
-                successCount++;
-                if (successCount >= requiredSuccess) {
-                    $("network_status").innerHTML = '<span style="color: green;">路由器已联网</span>';
-                }
-            }
-        }).catch(function() {
-            // 失败不处理，等待最终检查
-        });
-    });
-
-    // 最终严格判断
-    setTimeout(function() {
-        if (successCount < requiredSuccess) {
-            $("network_status").innerHTML = '<span style="color: red;">互联网访问异常</span>';
-        }
-    }, 6000);
 }
 
 function bytesToIEC(bytes, precision){
@@ -417,10 +358,6 @@ function submitInternet(v){
   <tr>
     <th><#MAC_Address#></th>
     <td colspan="3"><span id="WANMAC"></span></td>
-  </tr>
-  <tr>
-    <th>网络诊断:</th>
-    <td colspan="3"><span id="network_status">检测中...</span></td>
   </tr>
   <tr id="row_more_links">
     <td style="padding-bottom: 0px;">&nbsp;</td>
