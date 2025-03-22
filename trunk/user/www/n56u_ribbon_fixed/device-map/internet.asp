@@ -68,7 +68,14 @@ function checkNetworkStatus() {
         return;
     }
 
-    // 如果网线已插入，再进行网络检测
+    // 如果网线已插入，检查 WAN 口是否有 IP 地址
+    var wanIP = wanlink_ip4_wan();
+    if (!wanIP || wanIP === '--') {
+        $("network_status").innerHTML = '<span style="color: red;">WAN 口未获取到 IP</span>';
+        return;
+    }
+
+    // 如果 WAN 口有 IP，再进行外部网络检测
     var checkUrls = [
         "/images/loading.gif",  // 本地可靠资源
         "https://www.baidu.com/favicon.ico", // 小文件避免跨域限制
