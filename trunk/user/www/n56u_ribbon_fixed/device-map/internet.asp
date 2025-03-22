@@ -61,6 +61,14 @@ function initial(){
 }
 
 function checkNetworkStatus() {
+    // 先检查网线是否插入
+    var etherLink = wanlink_etherlink();
+    if (etherLink === '' || etherLink === 'No Link') {
+        $("network_status").innerHTML = '<span style="color: red;">未插入网线</span>';
+        return;
+    }
+
+    // 如果网线已插入，再进行网络检测
     var checkUrls = [
         "/images/loading.gif",  // 本地可靠资源
         "https://www.baidu.com/favicon.ico", // 小文件避免跨域限制
