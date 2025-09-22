@@ -48,7 +48,7 @@ function initial(){
 	show_footer();
 
 	if (!support_ipv4_ppe()){
-		showhide_div('row_hwnat', 4);
+		showhide_div('row_hwnat', 3);
 	}
 
 	if (support_sfe()){
