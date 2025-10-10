@@ -11,8 +11,8 @@
 #undef  BOARD_GPIO_LED_WIFI
 #undef  BOARD_GPIO_LED_SW2G
 #undef  BOARD_GPIO_LED_SW5G
-#define  BOARD_GPIO_LED_WAN	  15
-#define BOARD_GPIO_LED_POWER	13
+#undef  BOARD_GPIO_LED_WAN
+#define BOARD_GPIO_LED_POWER	15	/* sys_blue: 15, sys_red: 14 */
 #undef  BOARD_GPIO_LED_LAN
 #undef  BOARD_GPIO_LED_USB
 #undef  BOARD_GPIO_LED_ROUTER
