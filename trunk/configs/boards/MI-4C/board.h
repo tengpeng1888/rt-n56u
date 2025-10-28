@@ -12,7 +12,7 @@
 #undef  BOARD_GPIO_BTN_WPS
 #undef  BOARD_GPIO_LED_ALL 
 #undef  BOARD_GPIO_LED_WIFI
-#define BOARD_GPIO_LED_POWER	11	/* 11: blue, 44: yellow */
+#define BOARD_GPIO_LED_POWER	11
 #undef  BOARD_GPIO_LED_LAN
 #undef  BOARD_GPIO_LED_WAN
 #define BOARD_HAS_5G_11AC	0
